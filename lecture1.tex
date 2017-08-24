@@ -26,7 +26,6 @@ so that \(A = 2^{N/2}A_\text{L} + A_\text{R}\).
 This algorithm runs in \(\Theta(N^2)\) (additions are \(\Theta(n)\) and multiplications are \(\Theta(n)\)).
 
 Let's make it faster. Key idea: branch into 3 multiplications instead of 4.
-
 \begin{algorithm}
 	\caption{Multiply two equally-sized integers efficiently.}
 	\begin{algorithmic}
@@ -34,7 +33,9 @@ Let's make it faster. Key idea: branch into 3 multiplications instead of 4.
 		\State \(P_1 \leftarrow \text{Mult}(A_\text{L} + A_\text{R}, B_\text{L} + B_\text{R})\)
 		\State \(P_2 \leftarrow \text{Mult}(A_\text{R}, B_\text{L})\)
 		\State \(P_3 \leftarrow \text{Mult}(A_\text{L}, B_\text{R})\)
-		\State\Return \(2^NP1 + 2^{N/2}\left(P_1 - P_2 - P_3\right) + P_4\)
+		\State\Return \(2^NP1 + 2^{N/2}\left(P_1 - P_2 - P_3\right) + P_3\)
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
+
+If you make the recursive calls \(\Theta(1)\), \(\text{Mult}\) takes \(\Theta(N)\) per call.
