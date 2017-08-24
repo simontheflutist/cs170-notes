@@ -1,0 +1,25 @@
+\chapter{Introduction}
+\section{Meta-algorithms}
+\subsection{Divide and conquer}
+Objective: to multiply two \(n\)-bit integers, \(A\) and \(B\).
+Treat \(A\) as a string contatenated of two integers, \(A_\text{L}\) and \(A_\text{R}\),
+so that \(A = 2^{N/2}A_\text{L} + A_\text{R}\).
+
+\begin{align}
+	AB &= \left(2^{N/2} A_\text{L} + A_\text{R}\right) + \left(2^{N/2} B_\text{L} + B_\text{R}\right) \\
+		&= 2^N\left(A_\text{L}B_\text{L}\right) + 2^{N/2}\left(A_\text{R}B_\text{L} + A_\text{L}B_\text{R}\right) + A_\text{R}B_\text{R}
+\end{align}
+\begin{algorithm}
+	\caption{Multiply two equally-sized integers.}
+	\begin{algorithmic}
+		\Function{Mult}{$A,B$}
+		\State \(P_1 \leftarrow \text{Mult}(A_\text{L}, B_\text{L})\)
+		\State \(P_2 \leftarrow \text{Mult}(A_\text{R}, B_\text{L})\)
+		\State \(P_3 \leftarrow \text{Mult}(A_\text{L}, B_\text{R})\)
+		\State \(P_4 \leftarrow \text{Mult}(A_\text{R}, B_\text{R})\)
+		\State\Return \(2^NP1 + 2^{N/2}\left(P_2 + P_3\right) + P_4\)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+This algorithm runs in \(\Theta(N^2)\) (additions are \(\Theta(n)\) and \(\))

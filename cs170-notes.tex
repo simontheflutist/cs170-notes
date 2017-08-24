@@ -1,0 +1,33 @@
+\documentclass[10pt,article,oneside]{memoir}
+
+\usepackage[protrusion, expansion,kerning,tracking,spacing]{microtype}
+
+\usepackage[utf8]{inputenc}
+\usepackage{algorithmicx, algorithm}
+\usepackage[noend]{algpseudocode}
+
+\usepackage{lmodern}
+
+\usepackage{multicol}
+
+\usepackage{framed}
+\usepackage{xspace}
+
+\usepackage[T1]{fontenc}
+
+\usepackage[final]{pdfpages}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb, amsfonts, amsthm, commath}
+
+\microtypecontext{spacing=nonfrench}
+\nonfrenchspacing
+
+\begin{document}
+	\title{CS 170 notes}
+	\maketitle	
+	\clearpage
+	\tableofcontents
+	\clearpage
+	
+	\include{lecture1}
+\end{document}
