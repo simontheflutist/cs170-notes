@@ -9,6 +9,7 @@ so that \(A = 2^{N/2}A_\text{L} + A_\text{R}\).
 	AB &= \left(2^{N/2} A_\text{L} + A_\text{R}\right) + \left(2^{N/2} B_\text{L} + B_\text{R}\right) \\
 		&= 2^N\left(A_\text{L}B_\text{L}\right) + 2^{N/2}\left(A_\text{R}B_\text{L} + A_\text{L}B_\text{R}\right) + A_\text{R}B_\text{R}
 \end{align}
+
 \begin{algorithm}
 	\caption{Multiply two equally-sized integers.}
 	\begin{algorithmic}
@@ -22,4 +23,18 @@ so that \(A = 2^{N/2}A_\text{L} + A_\text{R}\).
 	\end{algorithmic}
 \end{algorithm}
 
-This algorithm runs in \(\Theta(N^2)\) (additions are \(\Theta(n)\) and \(\))
+This algorithm runs in \(\Theta(N^2)\) (additions are \(\Theta(n)\) and multiplications are \(\Theta(n)\)).
+
+Let's make it faster. Key idea: branch into 3 multiplications instead of 4.
+
+\begin{algorithm}
+	\caption{Multiply two equally-sized integers efficiently.}
+	\begin{algorithmic}
+		\Function{Mult}{$A,B$}
+		\State \(P_1 \leftarrow \text{Mult}(A_\text{L} + A_\text{R}, B_\text{L} + B_\text{R})\)
+		\State \(P_2 \leftarrow \text{Mult}(A_\text{R}, B_\text{L})\)
+		\State \(P_3 \leftarrow \text{Mult}(A_\text{L}, B_\text{R})\)
+		\State\Return \(2^NP1 + 2^{N/2}\left(P_1 - P_2 - P_3\right) + P_4\)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
