@@ -1,0 +1,109 @@
+\chapter{Divide and Conquer}
+\section{Master theorem}
+Let \(T[n] = aT[n/b] + \Theta(n^d)\), \(a, b, d \in \mathbb{R}^+\).
+\begin{description}
+	\item \(d < \log_ba\)
+\end{description}
+
+\section{Matrix multiplication}
+\subsection{Na\"ive algorithm}
+If \(A \in k^{n\times n}\) and \(B \in k^{n\times n}\), then \(AB \in k^{n\times n}\), where \(\left(AB\right)_{ij} = A[i,:] \cdot B[:,j]\). There are \(n^2\) entries that take \(n\) time each, so computing \(AB\) na\"ively takes \(O(n^3)\) time.
+
+\subsection{Divide-and-conquer algorithm}
+Divide the matrices into blocks.
+\begin{align}
+	\begin{pmatrix}
+		X_{ij}
+	\end{pmatrix}
+	\begin{pmatrix}
+		Y_{ij}
+	\end{pmatrix}
+	&=
+	\begin{pmatrix}
+		\left(XY\right)_{ij}
+	\end{pmatrix}\\
+	\begin{pmatrix}
+		A & B \\
+		C & D
+	\end{pmatrix}
+	\begin{pmatrix}
+		E & F \\
+		G & H
+	\end{pmatrix}
+	&=
+	\begin{pmatrix}
+		AE + BG & AF + BH \\
+		CE + DG &  CF + DH
+	\end{pmatrix}
+\end{align}
+
+\begin{algorithm}
+	\caption{Efficiently multiply two square matrices.}
+	\begin{algorithmic}
+		\Function{Mult}{$X, Y \in k^{n\times n}$}
+			\State \(P_1 \leftarrow AE\) 
+			\State \(\ddots\) (6 steps omitted; see algebra above)
+			\State \(P_8 \leftarrow DH\)
+			\State \Return \(\begin{pmatrix}
+				P_1 + P_2 & P_3 + P_4 \\
+				P_5 + P_6 & P_7 + P_8
+			\end{pmatrix}\)
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+Runtime analysis:
+\begin{align}
+	T[n] &= 8T\left[\frac{n}{2}\right] + O(n^2)
+	\intertext{Apply Master Theorem.}
+	&= O(n^3)
+\end{align}
+
+It turns out there's a way to end up with the results of those 8 submatrix multiplications using only 7 multiplications.
+\begin{align}
+T[n] &= \mathbf{7}T\left[\frac{n}{2}\right] + O(n^2) \\
+&= O(n^{2.81})?
+\end{align}
+
+\section{Median}
+The median of an \(n\)-set of numbers is the \(n/2\)th-largest number.
+
+\subsection{Na\"ive algorithm}
+Sort the list. \(O(n\log n)\).
+
+\subsection{Divide-and-conquer algorithm}
+Dividing into two lists and computing their medians doesn't always get you the median.
+\begin{algorithm}
+	\caption{Attempt at a divide-and-conquer algorithm for finding the median of a list of numbers \(n\) items long.}
+	\begin{algorithmic}
+		\Function{Median}{$S = \left\{a_1, \ldots, a_n\right\}$}
+			\State Choose \(v \in S\)
+			\State \(S_L \leftarrow \left\{a \in S \mid a < v \right\}\)
+			\State \(S_V \leftarrow \left\{a \in S \mid a = v \right\}\)
+			\State \(S_R \leftarrow \left\{a \in S \mid a > v \right\}\)
+			\State \Return ?? to be continued
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+It is helpful to generalize median to selection.
+\begin{algorithm}
+	\caption{Select \(k\)th smallest number in a set.}
+	\begin{algorithmic}
+		\Function{Select}{$S = \left\{a_1, \ldots, a_n\right\}$, k}
+		\State Choose \(v \in S\)
+		\State \(S_L \leftarrow \left\{a \in S \mid a < v \right\}\)
+		\State \(S_V \leftarrow \left\{a \in S \mid a = v \right\}\)
+		\State \(S_R \leftarrow \left\{a \in S \mid a > v \right\}\)
+		\If{\(\left|S_L\right| > k\)}
+			\State \Return \(\text{Select}(S_L, k)\)
+		\EndIf
+		\If{\(k > \left|S_L\right|\) and \(k \leq \left|S_L\right| + \left|S_V\right|\)}
+			\State \Return \(v\)
+		\EndIf
+		\If{\(k > \left|S_L\right| + \left|S_V\right|\)}
+			\State \Return \(\text{Select}(S_R, k - \left|S_L\right| - \left|S_V\right|)\)
+		\EndIf
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
