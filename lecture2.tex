@@ -107,3 +107,24 @@ It is helpful to generalize median to selection.
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
+
+\subsection{Runtime analysis}
+In the worse case, this algorithm chooses an extreme every single call. So \(\Theta(n)\) times you have to separate \(\Theta(n)\) items and the runtime is \(\Theta(n^2)\).
+
+How shall we judge the average case? (It is not interesting to consider only the best case, which is \(\Theta(1)\).) Instead, call pivots \emph{good} which are within \(n/4\) places of the median. The following inequalities follow:
+\begin{align}
+\left|S_L\right| &\leq \frac{\left|S\right|}{4} \\
+\left|S_R\right| &\leq \frac{\left|S\right|}{4}
+\end{align}
+A ``good'' pivot reduces the problem size by \(\frac{3}{4}\) per stack frame.
+
+Now to consider probability. Any given step,
+\begin{align}
+	\Pr\left(\text{\(v\) is a good pivot}\right) &= \frac{1}{2}
+	\intertext{Rewrite the runtime expression.}
+	T[n] &= \text{time after first good pivot} \notag\\&\phantom{=} + \text{time until first good pivot}\\
+	&\leq T\left[\frac{3}{4}n\right] + n\text{E}\left[\text{\# of pivots}\right] \\
+	\intertext{``trust me, this is 2.''}
+	&\leq T\left[\frac{3}{4}n\right] + 2n\\
+	&\leq O(n)
+\end{align}
