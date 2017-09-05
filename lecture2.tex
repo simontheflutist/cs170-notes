@@ -1,8 +1,14 @@
 \chapter{Divide and Conquer}
 \section{Master theorem}
-Let \(T[n] = aT[n/b] + \Theta(n^d)\), \(a, b, d \in \mathbb{R}^+\).
+A divide-and-conquer algorithm might be described by 
+\begin{align}
+	T(n) &= aT\left(\frac{n}{b}\right) + f(n).
+\end{align}
+Choose \(c^* = \log_b a\). There are three cases:
 \begin{description}
-	\item \(d < \log_ba\)
+	\item[leaf-heavy] If \(f(n) \in O\left(n^c\right)\), \(c< c^*\), \(T(n) \in \Theta(n^{c^*})\).
+	\item[balanced] If \(f(n) \in\Theta\left(n^{c^*}\left(\log n\right)^k\right)\), \(k \ge 0\), then \(T(n)\in\Theta\left(n^{c^*}\left(\log n\right)^{k + 1}\right)\).
+	\item[root-heavy] If \(f(n)\in\Omega\left(n^c\right)\), \(c > c^*\) \textbf{and} \(af\frac{n}{b} \leq kf(n)\), \(k < 1\) and \(n\gg 0\), \(T(n) \in \Theta\left(f(n)\right)\).
 \end{description}
 
 \section{Matrix multiplication}
