@@ -4,7 +4,72 @@
 use a chart \(\mathbb{R}^2\to\mathbb{C}, \left(x,y\right)\mapsto xe^{iy}\).
 
 \subsection{\(n\)th roots of unity}
-Divide the complex unit circle \(\left\|x\right\| = 1\) into \(n\) equally spaced points including 1. These are the \(n\)th roots of unity.
-\section{Fourier transform}
+Divide the complex unit circle \(\left\|x\right\| = 1\) into \(n\) equally spaced points including 1.
+These are the \(n\)th roots of unity, and there are \(n\) of them.
+
+On the complex unit circle, they are equally spaced points from \(1\).
+If \(\omega = \exp\frac{2\pi i}{n}\), the roots of unity are \(\left\{1, \omega, \ldots, \omega^{n - 1}\right\}\).
+
 \section{Polynomial evaluation/interpolation}
+Given \(p(x) = p_0 + \ldots + p_{n - 1}x^{n - 1}\) and \(\alpha \in \mathbb{C}\), compute \(p(\alpha)\).
+A na\"ive algorithm accomplishes this in \(\Theta(n)\)\footnote{This fact is surprisingly hard to understand: remember that you can compute all of the powers efficiently by remembering each previous power.}
+
+\section{Fourier transform}
+Given a polynomial \(p(x) = p_0 + \ldots + p_{n - 1}x^{n - 1}\), evaluate \(p(\omega^i)\) for all \(0 \leq i < n\). A na\"ive algorithm takes \(\Theta(n^2)\) time (the proof of this fact is left as an exercise to the reader).
+
+\section{Fast Fourier transform}
+\subsection{More properties of \(n\)th roots of unity}
+If \(n = 2^m\), then you can get all of them by \(x \mapsto \pm\sqrt{\cdot}\), which makes you a binary tree. The leaves at depth \(m\) (the root, 1, has depth 0) are the \(2^m\)th roots of unity.
+
+\begin{itemize}
+	\item \(n\)th roots appear in \(+/-\) pairs.
+	\item Squaring \(n\)th roots of unity results in \(\frac{n}{2}\)th roots of unity.
+\end{itemize}
+
+If \(p(\omega) = 0 + 1\omega + \ldots + 7\omega^7\), then \(p(-\omega) = \left(0 + 2\omega^2 + 4\omega^4 + 6 \omega^6\right) - \left(1\omega + 3\omega^3 + 5\omega^5 + 7\omega7\right)\) (even terms minus odd terms).
+
+Let \(p_e\) contain the even terms and \(p_o\) the odd terms.
+\begin{align}
+	\begin{pmatrix}
+		p(\omega^0)\\
+		\vdots\\
+		p(\omega^3)\\
+		p(\omega^4)\\
+		\vdots\\
+		p(\omega^8)
+	\end{pmatrix}
+	&=
+	\begin{pmatrix}
+		p_e(\omega^0) + p_o(\omega^0) \\
+		\vdots \\
+		p_e(\omega^3) + p_o(\omega^3) \\
+		p_e(\omega^0) - p_o(\omega^0) \\
+		\vdots \\
+		p_e(\omega^3) - p_o(\omega^3)
+	\end{pmatrix}
+\end{align}
+
+The FFT will split an \(n\)-FT to 2 \(\frac{n}{2}\)-FTs with \(O(n)\) root work for a combined runtime of \(\Theta(n\log n)\).
+
+If \(p_e\) is degree 6 in \(x\), it is degree 3 in \(t\). Then let \(P(x) = A_e\left(x^2\right) + xA_o\left(x^2\right)\).
+
+\begin{align}
+\begin{pmatrix}
+p(\omega^0)\\
+\vdots\\
+p(\omega^3)\\
+p(\omega^4)\\
+\vdots\\
+p(\omega^8)
+\end{pmatrix}
+&=
+\begin{pmatrix}
+A_e\left(\left(\omega^0\right)^2\right) + A_o\left(\left(\omega^0\right)^2\right) \\
+\vdots \\
+A_e\left(\left(\omega^3\right)^2\right) + A_o\left(\left(\omega^3\right)^2\right) \\
+A_e\left(\left(\omega^0\right)^2\right) - A_o\left(\left(\omega^0\right)^2\right) \\
+\vdots \\
+A_e\left(\left(\omega^3\right)^2\right) - A_o\left(\left(\omega^3\right)^2\right) \\
+\end{pmatrix}
+\end{align}
 \section{Polynomial multiplication}
