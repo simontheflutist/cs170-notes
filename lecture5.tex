@@ -1,0 +1,62 @@
+\chapter{FFT~application and Graphs}
+\section{Polynomial multiplication}
+Na\"ively multiplying two polynomials is \(\Theta(n^2)\).
+Instead of representing a degree \(n - 1\) polynomial by its coefficients, represent it by its values at \(n\) points.
+Notice that to multiply polynomials that are given in the value representation is \(\Theta(n)\) (actually, though, you need to evaluate the polynomials at \(2n + 1\) points, because the resulting polynomial will have degree 2.).
+Polynomial interpolation is the \textbf{inverse Fourier Transform}.
+Use magic: evaluate at at  \(\frac{1}{\omega}\), etc.
+
+\section{Graphs}
+Let \(G = \left(V, E\right)\) be a graph. Its adjacency matrix is \(A_G \in \left\{0, 1\right\}^{n\times n}\), \(A_{ij} = 1\) if \(\left(i, j\right) \in E\). Its adjacency list is \(V \rightarrow \mathcal{P}(V)\) that sends each vertex to its neighbors.
+
+\subsection{Undirected}
+\begin{algorithm}
+	\caption{Depth-first search.}
+	\begin{algorithmic}
+		\State \(\text{visited}[u]\leftarrow \text{false}\quad  \forall u\in V\)
+		\Function{Explore}{$u\in V$}
+			\State \(\text{visited}[u]\leftarrow\text{true}\)
+			\For {\(u'\in \text{neighbors}(u)\)}
+				\If {not \(\text{visited}[u']\)}
+					\State \(\text{Explore}(u')\)
+				\EndIf
+			\EndFor
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}
+	\(\text{Explore}[u]\) returns only after every vertex connected to \(u\) is visited.
+\end{theorem}
+\begin{proof}
+	We know \(\left(\text{visited}[v]\right)\implies \left(\text{\(u\) is connected to \(v\)}\right)\) and want to prove the converse. Suppose some connected \(v\) is not visited. There is a path from \(u\) to \(v\). Let \(w\) be the furthest node along this path such that its successor \(w'\) is not reached. But it cannot be the case that Explore is called on \(w\) but not on \(w'\).
+\end{proof}
+
+\subsection{Directed}
+
+\begin{algorithm}
+	\caption{Depth-first search on a directed graph with enter and exit times.}
+	\begin{algorithmic}
+		\State \(\text{visited}[u]\leftarrow \text{false}\quad  \forall u\in V\)
+		\State \(\text{pre}[u], \text{post}[u]\) maps to integer
+		\State \(\text{clock} \leftarrow 0 \)
+		\Function{TimedExplore}{$u\in V$}
+		\State \(\text{visited}[u]\leftarrow\text{true}\)
+		\For {\(u\to u'\) in \(E\)}
+			\State \(\text{pre}[u] = \text{clock++}\)
+		\If {not \(\text{visited}[u']\)}
+		\State \(\text{Explore}(u')\)
+		\EndIf
+			\State\(\text{post}[u] = \text{clock++}\)
+		\EndFor
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+Based on the search order (incl.~start points), there are 4 different types of edges.
+\begin{description}
+	\item[tree edges] are the closest paths to an adjacent point.
+	\item[cross edges] connect trees.
+	\item[back edges] go into a tree.
+	\item[forward edges] jump forward across tree edges.
+\end{description}
