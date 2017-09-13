@@ -1,0 +1,79 @@
+\chapter{More graphs}
+\section{Edge classification cont.}
+It's interesting to describe stack behavior chronologically using the Dyck language. For instance,
+
+\begin{description}
+	\item[forward/tree edge] (tree if there is nothing between \(u\) and \(v\))
+	\begin{align}
+	\overset{{u}}{(}
+	\quad
+	\overset{{v}}{(}
+	\quad
+	\overset{{v}}{)}
+	\quad
+	\overset{{u}}{)}
+	\end{align}
+	
+	\item[back edge]
+	\begin{align}
+	\overset{{v}}{(}
+	\quad
+	\overset{{u}}{(}
+	\quad
+	\overset{{u}}{)}
+	\quad
+	\overset{{v}}{)}
+	\end{align}
+	
+	\item [cross edge]
+	\begin{align}
+	\overset{{u}}{(}
+	\quad
+	\overset{{u}}{)}
+	\quad
+	\overset{{v}}{(}
+	\quad
+	\overset{{v}}{)}
+	\end{align}
+\end{description}
+
+\section{Directed cycles}
+\begin{align}
+	\exists(\text{back edge}) \iff \exists(\text{directed cycle})
+\end{align}
+
+\section{Topological sort}
+The task is to find a total ordering of a DAG's vertices that is a superset of the partial order induced by \(\rightarrow\).
+
+\subsection{Na\"ive algorithm}
+Find a source vertex and remove it. This is horrible, \(\Theta\left(n^3\right)\).
+
+\subsection{Better algorithm}
+Observe that \(u\to v\), \(\text{post}(u) > \text{post}(v)\). Sort the vertices in decreasing post values. More simply, return the reverse postorder.
+
+\section{Strongly connected components}
+A graph is \emph{strongly connected} if for all \(u,v \in V\) \(\exists u\rightsquigarrow v\) and \(\exists v\rightsquigarrow v\).
+A \emph{strongly connected component} is a maximal component that is strongly connected.
+Thus, every graph is a DAG of strongly connected components.
+(Simon's note: treat a directed graph as a commutative diagram depicting a small category. 
+Then the strongly connected components are isomorphism classes.)
+
+\subsection{Problem}
+Given a directed graph \((V, E)\), output a list of SCCs. Here is one idea:
+\begin{enumerate}
+	\item Pick a vertex in a sink SCC. (bottom of the partial order lattice)
+		\begin{itemize}
+			\item If DFS goes from SCC1 to SCC2, the maximum post value in SCC1 is greater than the maximum post value in SCC2.
+			\begin{itemize}
+				\item Therefore, the vertex with the largest post value will be in the source SCC.
+			\end{itemize}
+		\end{itemize}
+	\item DFS the sink SCC.
+\end{enumerate}
+
+More fully specified,
+\begin{enumerate}
+	\item DFS on \(\left(V, E_\text{reversed}\right)\) to identify a vertex in the sink SCC (viz.~the one with the largest post value).
+	\item DFS from sink-strongly-connected vertex to identify the sink SCC.
+	\item Delete the sink SCC, then repeat?
+\end{enumerate}
