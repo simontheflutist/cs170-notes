@@ -1,0 +1,136 @@
+\chapter{Shortest Paths}
+Define \(\operatorname{dist}[u,v]\) as the length of the shortest path from \(u\) to \(v\).
+
+\section{Problem}
+Given \(G = \left(V, E\right)\) and source node \(s\), compute shortest paths from \(s\) to every node in \(G\).
+
+\section{Simple case}
+Pretend first that all edges are the same length.
+Then all you have to do is breadth-first search, as the BFS tree explores nodes one layer at a time.
+
+\begin{algorithm}
+	\caption{Use a queue for BFS.}
+	\begin{algorithmic}
+		\Function{QBFS}{$G, s$}
+			\State \(Q\leftarrow\) empty queue
+			\State \(\text{visited}\leftarrow 1\) at \(s\), 0 everywhere else
+			\State \(\text{enqueue}(Q, s)\)
+			\While{not empty \(Q\)}
+				\State \(x\leftarrow \operatorname{dequeue}(Q)\)
+				\State \(\text{visited}[x]\leftarrow 1\)
+				\For{neighbor \(x'\) of \(x\)}
+					\If{not \(\operatorname{visited}[x']\)}
+						\State \(\text{enqueue}(Q, x')\)
+					\EndIf
+				\EndFor
+			\EndWhile
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+
+\begin{algorithm}
+	\caption{BFS counting distance.}
+	\begin{algorithmic}
+		\Function{QBFS}{$G, s$}
+			\State \(\text{dist}[s] \leftarrow 0\)
+			\State \(Q\leftarrow\) empty queue
+			\State \(\text{visited}\leftarrow 1\) at \(s\), 0 everywhere else
+			\State \(\text{enqueue}(Q, s)\)
+			\While{not empty \(Q\)}
+				\State \(x\leftarrow \operatorname{dequeue}(Q)\)
+				\State \(\text{visited}[x]\leftarrow 1\)
+				\For{neighbor \(x'\) of \(x\)}
+					\If{not \(\operatorname{visited}[x']\)}
+						\State \(\text{enqueue}(Q, x')\)
+						\State \(\text{dist}[x'] \leftarrow \text{dist}[x] + 1\)
+					\EndIf
+				\EndFor
+			\EndWhile
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+BFS and DFS are distinguished precisely by their choice of data structure.
+If in the above algorithm, you used a stack instead of a queue,
+the algorithm would perform DFS.
+
+\section{Harder case}
+Instead of all edges' having the same length use \(\ell: \left(\text{edges}\right)\to \mathbb{R}^+\).
+We are doomed! A dumb solution would be to add tons of degree-two vertices
+along long edges.
+
+\subsection{Intuition}
+Take our undirected graph as a road network.
+Suppose that there is an oil spill/zombie virus epidemic that is centered at our
+particular source node.
+Note, then, that the oil is spreading in every way at once, at a uniform
+\(1\) unit per minute.
+In this way the oil is certain to achieve the shortest path.
+We may identify the \emph{time} at which the oil reaches a node with the
+\emph{length} of the shortest path to the same node.
+
+\begin{quote}
+	\em
+	(Simon) this is the first time I encountered the floodfill
+	characterization of Dijkstra's algorithm! It is a very helpful illustration,
+	much easier to grasp than dynamic-programming node costs.
+\end{quote}
+
+In order to implement a chronology of events, we need an data structure with
+the following operations:
+\begin{description}
+	\item[insert] a vertex to schedule it for a time
+	\item[delete min] return and forget the next event
+	\item[decrease key] change the time of a scheduled event
+\end{description}
+
+\begin{tabular}{lll}
+	Operation & Binary heap & \(d\)-ary heap \\\hline
+	insert & \(\log n\) & \(\log n\) \\
+	delete min & \(\log n\) & \(d \log n\)\\
+	decrease key & \(\log n\) & \(d^{-1} \log n\)
+\end{tabular}
+
+\subsection{Dijkstra's algorithm}
+\begin{algorithm}
+	\caption{Compute shortest paths.}
+	\label{dijkstra}
+	\begin{algorithmic}
+		\Function{DijkSP}{$G, s$}
+			\State \(\text{dist}[v] \leftarrow \infty\) for all \(v \in G\)
+			\State \(Q\leftarrow\) empty priority queue (any implementation)
+			\State \(\text{insert}(Q, (v, \infty))\) for all \(v \in G\)
+			\State \(\text{dist}[s] \leftarrow 0\)
+			\State \(\text{decreasekey}(Q, (s, 0))\)
+			\While{not empty \(Q\)}
+				\State \((u, t)\leftarrow \text{deletemin}(Q)\)
+				\State \(\text{dist}[u] \leftarrow t\)
+				\For {edge \(u\to v\)}
+					\If {\(\text{dist}[v] > \text{dist}[u] + \ell(u, v)\)}
+						\State \(\text{decreasekey}(Q, (v, \text{dist}[u] + \ell(u, v))\)
+					\EndIf
+				\EndFor
+			\EndWhile
+		\EndFunction
+	\end{algorithmic}
+\end{algorithm}
+
+In Algorithm~\ref{dijkstra}, there are \(\left|V\right|\) \textsc{insert}s and \textsc{deletemin}s and \(\left|E\right|\) \textsc{decreasekey}s.
+Each priority queue operation takes log time, so altogether Dijkstra's
+completes in \(\Theta\left(\left(\left|V\right| + \left|E\right|\right)\log \left|V\right|\right)\).
+
+\subsection{Proof of correctness}
+\begin{enumerate}
+	\item Distance values keep decreasing. Nodes later in your path are getting closer to your destination!
+	\item All edge lengths are positive. Otherwise, it could be tricky.
+	\item Let \(R_l = \left\{\text{\(l\)th closest vertices to \(s\)}\right\}\).
+	\item The next step at time \(l\) is drawn from \(R_{l + 1} - R_{l}\).
+\end{enumerate}
+
+Proof by induction on the step \(l\).
+\begin{description}
+	\item[induction hypothesis] All the distances in \(R_l\) are computed correctly.
+	\item[base case] \(l = 0\)
+	\item[induction] Let \(v\) be the \((l + 1)\)th closest vertex. It is correctly accounted for in the \textsc{descreasekey} invocation.
+\end{description}
