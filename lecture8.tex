@@ -1,0 +1,40 @@
+\chapter{Negative Edge Lengths}
+Some graphs might have edges with negative lengths,
+but in this case Dijkstra's fails.
+The distance problem is not well-posed if there are \emph{negative cycles}.
+
+The following subroutine of Dijkstra's is true for any graph, even with negative edges.
+\begin{algorithmic}
+	\Function{Update}{edge $u\to v$, array $\text{dist}[\cdot]$}
+		\State \(\text{dist}[v] = \min(\text{dist}[v], dist[u] + \ell(u, v))\)
+	\EndFunction
+\end{algorithmic}
+In \textsc{Update}, vertex \(u\) says to \(v\):
+\begin{quote}
+	\em
+	I know a path of length \(\operatorname{dist}[u]\) to \(s\).
+\end{quote}
+
+\section{Illustration}
+\emph{This  illustration is due to Prof.~Wagner.}
+
+There is a number lock that requires a 10 digit password.
+When the first wrong digit is entered, the user is allowed to try that \emph{digit} again.
+It turns out that you can (obviously) break this lock in less than 100 digit attempts.
+
+\section{Intuition}
+Let \(\left(s, u_1, \ldots, u_{l - 1}, v\right)\) be the shortest path. We claim that if we run in order, not necessarily consecutively, \(\text{update}(s, u_1)\ldots\text{update}(u_1, u_2)\ldots\ldots\text{update}(u_{l - 1}, v)\), then we will end up with the correct \(\operatorname{dist}(v)\).
+
+Then call \textsc{update} so many times that the right order must have been in there somewhere. Specifically, call \textsc{update} on all edges, and do this mega-update \(\left(\left|V\right| - 1\right)\) times, for a runtime of \(\Theta\left(\left|V\right|\left|E\right|\right)\). (Proof by induction on path length).
+
+\section{Negative cycles}
+\begin{theorem}
+	In any graph, the shortest path between any two vertices has at most \(\left(\left|V\right| - 1\right)\) hops.
+\end{theorem}
+\begin{proof}
+	If it goes through any vertex twice, then you could obtain a shorter path by skipping the inner loop, unless there is a negative cycle.
+\end{proof}
+
+On a graph with no negative cycles, then the distance records should stabilize after running a ton of edge updates. To detect a negative cycle, run \emph{one} more round of edge updates (for \(\left|V\right|\) batch updates total); if any distance decreases, then there is a negative cycle.
+
+This is the \textbf{Bellman-Ford} algorithm.
