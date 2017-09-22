@@ -1,0 +1,40 @@
+\chapter{MSTs}
+Instead of \emph{greedy}, which suggests  economical (something you want), these are algorithms that are \emph{myopic}---they make hasty, short-sighted decisions.
+
+Given a weighted undirected graph \(G\), find the lowest-weight tree \(\in G\) that reaches all the vertices of \(G\).
+
+\section{Kruskal's algorithm}
+\begin{algorithm}
+	\caption{Compute the minimum spanning tree of a graph.}
+	\begin{algorithmic}
+		\Procedure{KruskalMST}{$G = (V, E)$}
+			\State Sort edges by weight.
+			\State \(T \leftarrow (V, \emptyset)\).
+			\While {\(\text{connectedComponents}(T) > 1\)}
+				\State Pop the next lightest edge onto \(T\).
+			\EndWhile
+			\Return \(T\).
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\subsection{Proof of Correctness}
+\begin{enumerate}
+	\item Removing an edge from an MST breaks it into two connected components (you can add one back to restore it).
+	\item Adding an edge to an MST crates a cycle. Removing any edge in the cycle restores the tree quality.
+\end{enumerate}
+A \emph{cut} is a partition of \(V\), the vertices of a graph. Two properties of cuts are important:
+\begin{enumerate}
+	\item Let \((S, S')\) be a cut of \(G\), in which \(T\) is an MST. Then \(T\) contains one of the lightest edges crossing the cut.
+	\begin{proof}
+		Suppose not. Let \(e\) be a lightest edge crossing \(S\)---\(S'\). Then there exists \(e'\) with \(w(e') > w(e)\) that crosses the cut. Then removing \(e'\) and adding \(e\) is a lighter spanning tree.
+	\end{proof}
+	\item Let \((S, S')\) be a cut of \(g\). Let \(X \subseteq E\), where \((V, E)\) is an MST. Let \(e\) be the lightest edge crossing \(S\text{---}S'\).
+	Then \(X\cup\left\{e\right\} \subseteq \left(\text{edges of some MST}\right)\).
+\end{enumerate}
+
+\subsection{Implementation}
+You need a union-find data structure to keep track of connected components. In increasing edge order, add edges that cross connected components.
+
+\section{Prim's algorithm}
+Idea: pick the lightest edge across the cut \(\left(\text{partial MST}\right)\)---\(\left(\text{rest of graph}\right)\). Continue until the partial MST spans.	
