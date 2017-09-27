@@ -1,0 +1,135 @@
+\chapter{MST Implementation}
+\subsection{Requirement}
+Kruskal's algorithm requires a data structure that records a collection of subsets \(\left\{S_1, S_2,\ldots\right\}\) that partitions \(\left\{1, \ldots, n\right\}\). It need to support the operations:
+\begin{description}
+	\item[find] find the set that \(x\) belongs to.
+	\item[union] the set containing \(x\) and the set containing \(y\) are joined as one set.
+\end{description}
+\subsection{Implementation idea}
+Store partitions as directed trees (where arrows point \(\text{child}\to\text{parent}\)). We have a map \(\pi\) that sends an element \(x\) to its partition ID, which is identified with the root of the tree.
+
+\begin{enumerate}
+	\item 
+\begin{algorithmic}
+	\Procedure{MakeSet}{$x$}
+		\State \(\pi(x) := x\).
+		\State \(\operatorname{rank}(x) = 1\)
+	\EndProcedure
+\end{algorithmic}
+
+This procedure is clearly \(\Theta(1)\).
+
+\item 
+\begin{algorithmic}
+	\Procedure{Find}{$x$}
+		\While{\(\pi(x)\not=x\)}
+			\State \(x\leftarrow \pi(x)\)
+		\EndWhile
+	\EndProcedure
+\end{algorithmic}
+
+This procedure's runtime is tightly bounded in the height of the tree (length of a leaf-to-root path).
+
+\item 
+\begin{algorithmic}
+	\Procedure{Union}{$x, y$}
+		\State \(r_x\leftarrow \operatorname{Find}(x)\)
+		\State \(r_y \leftarrow \operatorname{Find}(y)\)
+		\State \(\pi(r_x) := r_y\)
+	\EndProcedure
+\end{algorithmic}
+Runtime tightly bounded by \textsc{Find}'s runtime.
+\end{enumerate}
+
+\subsection{Detailed runtime analysis of first idea}
+Begin with disjoint sets \(\left\{1, \ldots, n\right\}\). Call \(\operatorname{Union}(1, 2), \ldots, \operatorname{Union}(n - 1, n)\). Most \textsc{Find} operations will take \(O(n)\) time. What you want, therefore, is a tree that is as \emph{balanced} as possible.
+
+\subsection{Modification to first idea}
+Whenever merging two trees, point the root of the shorter tree at the root of the taller tree.
+
+\begin{enumerate}
+	\item 
+	\begin{algorithmic}
+		\Procedure{MakeSet}{$x$}
+		\State \(\pi(x) := x\).
+		\State \(\operatorname{rank}(x) = 0\)
+		\EndProcedure
+	\end{algorithmic}
+	
+	This procedure is clearly \(\Theta(1)\).
+	
+	\item 
+	\begin{algorithmic}
+		\Procedure{Find}{$x$}
+		\While{\(\pi(x)\not=x\)}
+		\State \(x\leftarrow \pi(x)\)
+		\EndWhile
+		\EndProcedure
+	\end{algorithmic}
+	
+	This procedure's runtime is tightly bounded in the height of the tree (length of a leaf-to-root path).
+	
+	\item 
+	\begin{algorithmic}
+		\Procedure{Union}{$x, y$}
+		\State \(r_x\leftarrow \operatorname{Find}(x)\)
+		\State \(r_y \leftarrow \operatorname{Find}(y)\)
+		\If{\(\operatorname{rank}(r_x) > \operatorname{rank}(r_y)\)}
+			\State \(\pi(r_y) := r_x\)
+		\ElsIf{\(\operatorname{rank}(r_y) > \operatorname{rank}(r_x)\)}
+			\State \(\pi(r_x) := r_y\)
+		\ElsIf{\(\operatorname{rank}(r_y) = \operatorname{rank}(r_x)\)}
+			\State \(\pi(r_x) := r_y\)
+			\State \(\operatorname{rank}(r_y) \leftarrow \operatorname{rank}(r_y) + 1\)
+		\EndIf
+		\EndProcedure
+	\end{algorithmic}
+	Runtime tightly bounded by \textsc{Find}'s runtime.
+\end{enumerate}
+
+There are two properties associated with this implementation:
+\begin{enumerate}
+	\item \(\left(\pi(x) \neq x\right) \implies \left(\operatorname{rank}(\pi(x)) > \operatorname{rank}(x)\right)\)
+	\item A node \(x\) with \(\operatorname{rank}(x) = k\) has at least \(2^k\) descendants.
+	\begin{itemize}
+		\item Corollary: there are at most \(\frac{n}{2^k}\) nodes with rank \(k\).
+	\end{itemize}
+\end{enumerate}
+We conclude that all \textsc{Find} and \textsc{Union} operations take \emph{at most} \(\log n\) steps.
+
+\subsection{Another modification (final idea)}
+Every time you run \textsc{Find}, point all vertices en route to the root directly, so that next time \textsc{Find} will complete in constant time on any node along this path. This strategy is called \emph{path compression}.
+
+\begin{algorithm}
+	\caption{Find parent with (destructive) path compression.}
+	\begin{algorithmic}
+		\Procedure{Find}{$x$}
+		\If{\(\pi(x)\not=x\)}
+		\State \Return {x}
+		\Else
+		\State \(\pi(x)\leftarrow \operatorname{Find}(\pi(x))\) 
+		\Comment mutates \(\pi\)
+		\State \Return \(\pi(x)\)
+		\EndIf
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}
+	The runtime of \(m\) find operations is \(O\left(\left(m + n\right)\log^* n\right)\). (\,\(\log^*\), the number of iterated logarithms until you hit 1, is for all practical purposes less than 6.)
+\end{theorem}
+\begin{proof}
+	Observe that path compression does not affect rank values. (At this point rank no longer concretely reflects the height of the tree; it is only an upper bound thereof.)
+	
+	A \emph{dead} node is one whose rank can no longer change (a child). 
+	An \emph{alive} node is one whose rank can still be changed by \textsc{Union}. Therefore, every node is alive until it takes another node for its root.
+	
+	The next step is to find a clever way to count operations for an amortized runtime. Classify potential values of rank into level sets of \(\log^*(\cdot)\). Give a budget of \(2^k\) to nodes in rank levels \(\left\{k + 1, \ldots, 2^k\right\}\). In this rank level there are at most \(\frac{n}{2^{k + 1}}\) nodes (by property~3). The total budget allocated to any given level is given by a geometric series bounded by \(n\), and the total budget allocated to the whole data structure is bounded by \(n\log^* n\).
+	
+	Now consider all the ranks en route a path traversed by \textsc{Find}. There are edges that stay within \(\log^*\) levels, and
+	also edges that cross \(\log^*\) levels. Thus we can bound the total runtime cost of \textsc{Find} by \(\left(\text{\# of \emph{inter}-level edges}\right) + \left(\text{\# of \emph{intra}-level edges}\right)\).
+
+	In that last summation, the first term is \(O(\log^* n)\), so the second one will be of greater importance. The second term will be paid from the nodes' budget (each intra-level edge will be paid for by its source node).
+	
+	The next step is to show that a node is in fact able to pay its own costs. But inter-level costs are necessarily exponentially bounded, just as the node's budget is.
+\end{proof}
