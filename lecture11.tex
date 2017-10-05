@@ -1,0 +1,66 @@
+\chapter{More Greedy Algorithms}
+A large text document has 8 different symbols, at differing frequencies:
+
+\noindent
+\begin{tabular}{lr}
+	Symbol & Frequency \\\hline
+	A & 100 \\
+	B & 25 \\
+	C & 25 \\
+	D & 50 \\
+	E & 60 \\ 
+	F & 40 \\
+	G & 200 \\
+	H & 500
+\end{tabular}
+
+If you encode each letter as 3 bits, then you will need 3000 bits to encode this file. Simply cheaping the popular letter into less bits will not do. But if we encode ``H'' as 0, then we can begin the others with 1 (making them 4 bits) and we can finish the file in 2500 bits.
+
+\section{Prefix-free encoding}
+A dictionary is prefix-free if no code is a prefix of any other code.
+In prefix-free encoding, the decoding program can be modeled as a binary decision tree
+in which the leaves are symbols. The goal is to find a decision tree that specifies the shortest prefix-free
+encoding.
+
+\subsection{Optimality conditions}
+\begin{enumerate}
+	\item In an optimal tree, the least frequent letter is at the greatest depth.
+	
+	\begin{proof}
+		Suppose the least frequent letter is not at the deepest part of the tree but is higher. Then swap it with a more frequent letter that is at the deepest layer of the tree. Now the resultant encoding is shorter.
+	\end{proof}
+	
+	\begin{quotation}
+		\em Note: most greedy algorithms will be proved like this:
+		prove a property by contradiction in which you can trivially deform an inferior solution into
+		a better solution.
+	\end{quotation}
+	
+	\item WLOG, the two least frequent letters are siblings.
+	
+	\begin{proof}
+		Suppose they don't appear together. Swap, preserving encoding length.
+	\end{proof}
+\end{enumerate}
+
+\subsection{Optimal algorithm}
+All letters begin as singleton trees. Combine the two lightest trees until there is only one tree.
+
+\section{Horn SAT}
+SAT is boolean satisfiability. Given boolean variables and boolean constraints, find an assignment that satisfies all the constraints. It is in general very hard.
+
+\subsection{Motivation}
+There are \(n\) bachelors trying to organize a party. \(x_i\) is true if bachelor \(i\) is invited to the party.
+\begin{description}
+	\item[unary] some variables must be true/false
+	\item[positive clauses/groups] conjunctions on the left implies unary positive on the right.
+	\item[negative clauses] negation of a conjunction
+\end{description}
+
+\subsection{Greedy algorithm}
+Idea: make variables false unless absolutely necessary.
+
+\begin{enumerate}
+	\item Begin with all variables false except for unary positive constraints.
+	\item Greedily satisfy positive clauses.
+\end{enumerate}
