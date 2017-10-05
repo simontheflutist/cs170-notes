@@ -1,0 +1,100 @@
+\chapter{Set cover, DP}
+\section{Set cover problem}
+\begin{description}
+	\item[input] 
+		universe
+		\(U = \left\{1, \ldots, n\right\}\),
+		collection of subsets
+		\(\left\{S_1, \ldots, S_m\right\} \subseteq \mathscr{P}(U)\)
+	\item[output] cover \(U\) with as few sets as possible
+\end{description}
+
+\subsection{Greedy idea}
+Recursively include the set that covers the biggest number of not-yet-covered elements. (Stop when they're all covered.)
+\begin{algorithmic}[1]
+%	\Procedure{GreedyCover}{}
+	\While{\(\bigcup F \neq U\)}
+		\State Cover as many more as possible with \textsc{one} more set \(\to F\).
+	\EndWhile
+%	\EndProcedure
+\end{algorithmic}
+%\begin{enumerate}
+%	
+%\end{enumerate}
+\begin{theorem}
+	If the optimal solution picks \(k\) sets, then the greedy algorithm picks \(O(k\log n)\) sets.
+\end{theorem}
+\begin{proof}
+	Suppose \textsc{Greedy} picks
+	\(\left\{A_1, A_2, \ldots, A_t\right\}\).
+	Let
+	\(\left\{U_i\right\}\)
+	be the elements yet to be covered after adding the \(i\)th set
+	(\(U_i = U - \bigcup_{j \leq i} A_j\)).
+	
+	We claim that \textsc{Greedy} covers at least \(k^{-1}\) of \(U_i\) at step \(i\).
+	To motivate this claim, consider
+	\begin{align}
+		\left|U_0\right| &= n \\
+		\left|U_1\right| &\leq \left|U_0\right| - \frac{1}{k}\left|U_0\right| \\
+		&\leq \left|U_0\right| \left(1 - \frac{1}{k}\right) \\
+		&\ddots \\
+		\left|U_t\right| &\leq n\left(1 - \frac{1}{k}\right)^t \\
+		&\leq n \exp \left(-\frac{t}{k}\right). \\
+		\intertext{Then it suffices if}
+		t &> k\log n.
+	\end{align}
+	
+	At step \(i\), \textsc{optimal} covers \(U_i\) in \(k\) sets
+	(maybe you don't need \emph{all} of them at stage \(U_i\) but these definitely work).
+	That means (clearly---if no set did, they coulld not cover at all)
+	\emph{some} set \(S \in \textsc{optimal}\) covers \(\frac{\left|U_i\right|}{k}\)
+	elements of \(U_i\).
+	By the greedy criterion, \textsc{Greedy} picks \emph{at least} \(\frac{\left|U_i\right|}{k}\)
+	elements of \(U_i\).
+\end{proof}
+
+\section{Dynamic Programming}
+\subsection{Longest path in a DAG}
+\begin{description} 
+	\item[input] an unweighted DAG
+	\item[output] find the longest path
+\end{description}
+\textsc{wlog} we may imagine the DAG linearized.
+
+The first step of dynamic programming is to identify a \emph{subproblem}. In his example, choose
+\begin{align}
+	L[i] &= \text{length of longest path ending at \(i\)}
+\end{align}
+so that, say, in a linearized DAG of 7 nodes,
+there are 7 subproblems.
+The solution to the whole problem is \(\max\left\{\ldots L[i] \ldots\right\} \).
+
+The second step of DP is to write a recurrence relation between the subproblems.
+Suppose in a graph of 7 nodes, we wanted to obtain \(L[4]\).
+We will look at all predecessors to 4 and choose the longest of them,
+so 
+\begin{align}
+	L[i] &= 1 + \max_{\text{\(\exists\) edge \(i_\flat\to i\)} } L\left[i_\flat\right].
+\end{align}
+The key to translating a recurrence relation to code
+is to consider the order in which you need to know the values so that you can guarantee that
+when you need a value, it is already there.
+In our case, \(L\left[i\right]\) depends on the previous entries, viz.~at \(j< i\):
+\begin{algorithmic}[1]
+	\State \(L[1] \gets 1\)
+	\Comment (could also be 0)
+	\For {\(i = 2\) to \(n\)}
+		\State \(L[i] \gets 1 + \displaystyle\max_{\text{\(i_\flat\to i\)} } L\left[i_\flat\right]\)
+	\EndFor
+\end{algorithmic}
+
+\subsection{Longest increasing sequence}
+\begin{description}
+	\item[input] a sequence of numbers \(a[1], \ldots, a[n]\)
+	\item[output] a longest subsequence (not necessarily consecutive) that is monotonously increasing
+\end{description}
+
+Goal: construct a DAG such that every subsequence is a path in the DAG.
+The vertices will be elements in the sequence, in the given order.
+Form connections \(a[i]\to a[j]\) if \(i < j\) and \(a[i] < a[j]\).
