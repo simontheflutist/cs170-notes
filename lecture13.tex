@@ -1,0 +1,80 @@
+\chapter{Dynamic Programming II}
+\section{Edit Distance}
+\begin{description}
+	\item[input] Two strings \(X[1\ldots n]\) and \(Y[1\ldots m]\).
+	\item[goal] Number of characterwise \textsc{insert}s,
+		\textsc{delete}s, and \textsc{substitute}s required to edit \(X\) into \(Y\).
+\end{description}
+
+Our subproblem is
+\begin{align}
+	E[i,j] &= \text{
+		edit distance between \(X[1\ldots i]\)
+		and \(Y[1\ldots j]\),
+		}
+\end{align}
+so that we, desiring \(E[n, m]\), have \(nm\) subproblems.
+To work on the recurrence relation, consider an optimal solution
+and ``break off'' the last piece.
+We see that there are three cases: this last \(X\)-\(Y\)
+character matchup could be either insertion, deletion, or substitution
+(\(\text{diff}: \text{character}^2 \to 2\) is 1 if different and 0 if equal).
+\begin{align}
+	E[i,j] &=
+	\begin{cases}
+		1 + E[i, j - 1], & \text{we did an insertion} \\
+		1 + E[i - 1, j], & \text{we did a deletion} \\
+		\text{diff}\left(x[i], y[j]\right) + E[i - 1, y - 1], & \text{we did a keep or a substitution}
+	\end{cases}
+%\end{align}
+\intertext{Notice that in the optimal \(E\) (you have made all the right choices),}
+%\begin{align}
+	E[i, j] &= \min\left\{1 + E[i, j - 1], 1 + E[i - 1, j], \text{diff}\left(x[i], y[j]\right) + E[i - 1, y - 1]\right\}
+\end{align}
+To get an algorithm, we also need base cases:
+\begin{align}
+%	\forall i 
+	E[i, 0] &\gets i \\
+%	&&\forall j 
+	E[0, j] &\gets j
+\end{align}
+If we wanted to get the concrete sequence of edits, we would retrace the \texttt{min}s back to \(E[0,0]\).
+
+\section{Gambling Strategy}
+You have \(n\) gambles to split between 2 games:
+\begin{align}
+\operatorname{\text{game 1}}&: \$1 \mapsto \begin{cases}
+		\$2, &\text{w.p. } \frac{1}{2} \\
+		\$0, &\text{w.p. } \frac{1}{2}
+	\end{cases} \\
+\operatorname{\text{game 2}}&: \$3 \mapsto \begin{cases}
+\$6, &\text{w.p. } \frac{2}{3}\\
+\$1, &\text{w.p. } \frac{1}{3}
+\end{cases}
+\end{align}
+Beginning with \$100, \emph{find a strategy} to end with a prime number of dollars at the end of the game. How do I maximise the probability that the goal is satisfied?
+
+We choose the following subproblem decomposition: 
+\begin{align}
+P[i, m] &= \Pr \left\{\mbox{optimal strategy reaches goal starting with \(\$m\) at the end of game \(i\)}\right\} \notag
+\end{align}
+and we are seeking \(P[0, 100]\),
+as it suffices to compute probabilities as the optimal strategy is to choose the path most likely to succeed. The recurrence relation follows naturally:
+\begin{align}
+P[i, m] &=
+\begin{cases}
+	\frac{1}{2} P[i + 1, m + 1] + \frac{1}{2} P[i + 1, m - 1], &\text{played game 1} \\
+	\frac{2}{3} P[i + 1, m + 3] + \frac{1}{3} P[i + 1, m - 2], &\text{played game 2}
+\end{cases}
+\intertext{and in the case of optimality,}
+P[i, m] &= % I don't like this matrix formatting
+\max \begin{Bmatrix}
+	\frac{1}{2} P[i + 1, m + 1] + \frac{1}{2} P[i + 1, m - 1],\\
+	\frac{2}{3} P[i + 1, m + 3] + \frac{1}{3} P[i + 1, m - 2]
+\end{Bmatrix}
+\intertext{and a base condition for the end of the game:}
+P[n, m] &= \begin{cases}
+1,&m \text{ prime} \\
+0, &\text{otherwise}
+\end{cases}
+\end{align}
