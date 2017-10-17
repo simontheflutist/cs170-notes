@@ -1,0 +1,52 @@
+\chapter{Dynamic Programming III}
+\section{Knapsack problem} 
+\begin{description}
+	\item[input] A collection of objects \(\left\{i\right\}\) with weights \(w_i\) and values \(v_i\), along with a maximum weight \(W\).
+	\item[output] Choose objects with repetition to maximize total value subject to a given maximum weight.
+\end{description}
+
+The subproblem is
+\begin{align}
+	K[w] &= \text{value of best bundle with weight \(\leq w\)}
+\end{align}
+and the solution to the whole problem is \(K[W]\).
+A recurrence relation is
+\begin{align}
+	K[w] &= \max_{i: w_i \leq w} \left(v_i + K[w - w_i]\right) \\
+	K[0] &= 0
+\end{align}
+
+\section{Knapsack without repetition}
+The subproblem has to change: add items in a particular order.
+\begin{align}
+K[w, i] &= \text{maximum value of a bundle with weights \(\leq w\) from items \(\leq i\)}
+\end{align}
+The recurrence considers objects one at a time as either picked or discarded:
+\begin{align}
+K[w, i] &= \max_i\begin{cases}
+	K[w - w_i, i - 1] + v_i, &\text{(picked)}\\
+	K[w, i - 1], &\text{(discarded)}
+\end{cases}\\
+K[0, \cdot] &= 0
+\end{align}
+
+The runtime of this algorithm is \(\Theta(nW)\). It is unsatisfactory, however, that this runtime depends on the input \emph{numbers}. It is not polynomial in \emph{input size}.
+
+\section{Chocolate bar}
+A chocolate bar is a \(n\times n\) grid of 1s and 0s. 1s indicate that there is a raisin; 0s indicate that there is no raisin. The goal is to find the smallest number of breaks that separate 0s and 1s.
+
+Specify a subrectangle by its bottom left and top right vertices.
+\begin{align}
+T[(x_1, y_1), (x_2, y_2)] &= \text{min \# breaks req.~to seperate in just this rectangle}
+\end{align}
+There are two ways to cut: either at \(x_1 < \mathbf{x} < x_2\) or at \(y_1 < \mathbf{y} < y_2\).
+\begin{align}
+T[(x_1, y_1), (x_2, y_2)] &= \min_{\begin{matrix}
+	x_1 < \mathbf{x} < x_2\\ y_1 < \mathbf{y} < y_2
+	\end{matrix}} 
+\begin{cases}
+1 + T[(x_1, y_1), (\mathbf{x}, y_2)] + T[(\mathbf{x}, y_1), (x_2, y_2)] \\
+1 + T[(x_1, y_1), (x_2, \mathbf{y})] + T[(x_1, \mathbf{y}), (x_2, y_2)] 
+\end{cases}
+\end{align}
+The base case is that it takes 0 cuts if a subrectangle is homogeneous.
