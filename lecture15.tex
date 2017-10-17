@@ -1,0 +1,70 @@
+\chapter{Dynamic Programming IV}
+\section{Traveling Salesman Problem}
+Given an undirected weighted graph, (\textsc{Goal}) find the cheapest cycle that visits every node exactly once.
+A na\"ive algorithm would be to consider every possible cycle, which makes for a \(\Theta(n!)\) runtime.
+
+Instead of solving \textsc{Goal}, solve a simpler problem \(\textsc{Goal}'\): find the least-cost path that visits each node exactly once
+(the reduction will be shown later).
+Choosing a subproblem is trickier than it was for the Knapsack problem,
+as the order of choices matters. We choose \(C[S,j]\) to represent the smallest cost to
+go from \(1\) to \(j\), visiting vertices exactly once, using vertices only in set \(S\subseteq\left\{1\ldots n\right\}\).
+Our runtime is going to be around \(\Theta(n2^n)\), by no means fast, but faster than factorial.
+
+Now to find a recurrence: we know the path for \(C[S,j]\) begins at \(1\) and ends at \(j\).
+Suppose we are looking for a subproblem by trimming off \(j\)---what vertex is connected to \(j\)?
+Call it \(i\). Then the recurrence is among all possible predecessors to \(j\):
+\begin{align}
+C[S,j] &= \min_{i\in S} \left(C[S - j, i] + \ell[i,j]\right)
+\end{align}
+Base cases:
+\begin{enumerate}
+%	\item \(\left|S\right| = 1\)
+%	\begin{enumerate}
+		\item \(\left|S\right| = 1\), \(i = 1 \implies C[S, i] = 0\)
+		\item \(\left|S\right| = 1\), \(i \neq 1 \implies C[S, i] = \infty\)
+%	\end{enumerate}
+\end{enumerate}
+
+We must solve problems in increasing order of \(\left|S\right|\).
+\begin{algorithmic}[1]
+	\State \(C(\{1\}, 1) \gets 0\)
+	\State \(C(S, 1) \gets \infty\), \(S \neq \{1\}\)
+	\For{\(s \in \left\{2\ldots n\right\}\)}
+		\For {\(S: \left|S\right| = s\)}
+			\For {\(j\in \left\{1\ldots n\right\}\)}
+				\State \(C[S,j] \gets \min_{i\in S} \left(C[S - j, i] + \ell[i,j]\right)\)
+			\EndFor
+		\EndFor
+	\EndFor
+\end{algorithmic}
+To solve \textsc{Goal}, just look at all possible \(j\)s.
+
+\section{All-pairs Shortest Paths}
+Given an undirected graph, find \(d[u, v]\) for all \(u,v\). Running Dijkstra's enough times gives a runtime of \(O\left(\left|V\right|^4\right)\).
+The subproblem is \(d[i, j, k]\), which is the shortest distance between \(i\) and \(j\) using vertices \(\left\{1\ldots k\right\}\).
+\begin{align}
+d[i,j,k] &= \min \begin{cases}
+d[i,j,k - 1], &\text{\(k\) is not on the shortest path} \\
+d[i, k, k - 1] + d[k,j, k - 1], &\text{\(k\) is on the shortest path}
+\end{cases} \\
+d[i,j, 0] &= \begin{cases}
+\ell[i,j], &(i,j) \in E \\
+\infty, &\text{otherwise}
+\end{cases}
+\end{align}
+To get pseudocode, just make sure \(k\) is in the outer loop.
+
+\section{Independent set in a tree}
+Given an undirected tree, \(I\subseteq V\) is an \textsc{independent set} if \(\forall u,v\in I\), \(\left(u,v\right)\notin E\). The goal is to find a largest independent set. (In a general graph there is no efficient solution.)
+
+A suitable subproblem is
+\begin{align}
+I(v) &= \left|\text{largest indep.~set of subtree rooted at \(v\)}\right|
+\end{align}
+Either \(v\) contributes to the largest independent set headed by \(v\) or it is not:
+\begin{align}
+I(v) &= \max \begin{cases}
+	1 + \sum_{u\xrightarrow{\text{grandchild}}v} I(u), &\text{\(v\) is included}\\
+	\sum_{u\xrightarrow{\text{child}}v} I(u), &\text{\(v\) is not included}
+\end{cases}
+\end{align}
