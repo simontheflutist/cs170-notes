@@ -1,0 +1,92 @@
+\chapter{Linear programming}
+Suppose you want to grow a vegetable garden. You can grow either peas or carrots.
+\begin{center}
+	
+\begin{tabular}{l|rr}
+	& Peas & Carrots \\ \hline
+	Profit & \$4/bushel & \$2/bushel \\
+	Land & 3 sq.~yd.~sunny & 3 sq.~yd.~shady \\
+	Water & 3~units & 2~units
+\end{tabular}
+\end{center}
+
+We have 70 sq.~yd.~of sunny land, 75 sq.~yd.~of shady land, and 100 units of water. How can we maximize our profit?
+Say the quantity of peas we wish to plant is \(x_1\)
+and the quantity of carrots we wish to plant is \(x_2\).
+Then our constraints are:
+\begin{align}
+3x_1 &\leq 60 & 3x_2 &\leq 75 && \text{(land)} \\
+3x_1 + 2x_2 &\leq 100 && && \text{(water)} \\
+x_1 &\geq 0 & x_2 &\geq 0 && \text{(common sense/rules)}
+%\end{align}
+\intertext{and we wish to maximize:}
+%\begin{align}
+\operatorname{Profit} &= \max \left(4x_1 + 2x_2\right)
+\end{align}
+One idea: graph feasible region, then draw level sets of the objective function,
+moving in the direction that seems to increase the profit.
+When formerly we considered brute-forcing (uncountably)
+infinite points, the problem is reduced to considering corners of the feasible region.
+
+%\begin{align}
+%\begin{matrix}
+%\max &4x_1 + 2x_2 \\
+%\text{subject to} & \begin{aligned}
+%x_1 &\geq 0 \\
+%x_2 &\geq 0
+%\end{aligned}
+%\end{matrix}
+%\end{align}
+
+\section{Simplex algorithm}
+Idea: start at a corner and keep on going to a better neighbor.
+But with \(m\) constraints in \(n\) variables, there are \(\begin{pmatrix}
+m \\ n
+\end{pmatrix}\) corners (solve all systems of \(n\) equations in \(n\) unknowns).
+
+The simplex algorithm also supplies a proof.
+If it has achieved objective value \(j\) at some corner,
+the coordinates of the corner give a way to combine that corner's
+constraints in a way that puts an upper bound on the feasible objective value.
+
+\subsection{Minimizing cost (carpet production)}
+There is \emph{demand} \(d_i\) for months \(1\leq i \leq 12\), \(440\leq d_i \leq 920\) for all \(i\).
+You have 30 employees that must be paid \(\$2000\)/month.
+Each employee can make 20 carpets/month.
+An employee can work overtime to make up to 6 extra carpets
+per month at a rate of \$180/carpet.
+You can fire an employee for \$400 and hire one for \$320.
+It costs \$8 to store a carpet for one month.
+
+Define variables \(e_i\) for the number of employees in month \(i\). \(e_0 = 30\). \(x_i\) will be the
+number of carpets made in month \(i\). \(s_i\) will be the number of carpets stored by the end of month \(i\).
+\(o_i\) is the number of overtime carpets.
+\(h_i\) and \(f_i\) are the numbers of the hired and fired workers, respectively.
+\begin{align}
+	\begin{matrix}
+		\min & \sum_i \left(2000 e_i + 180 o_i + 8s_i + 400 f_i + 320 h_i\right) \\
+		\text{subj.~to} & \begin{aligned}
+		\text{all vars.} &\geq 0 \\
+		e_i &= e_{i -1} + h_i - f_i \\
+		x_i &= 20e_i + o_i \\
+		o_i &\leq 6e_i \\
+		s_i &= s_{i - 1} + x_i - d_i
+		\end{aligned}
+	\end{matrix}
+\end{align}
+
+\subsection{Parameterizing LPs}
+You can change a minimization to a maximization by negating all variables.
+An equality constraint ``\(=\)'' can be replaced by one ``\(\leq\)'' and one ``\(\geq\).''
+
+You can change an inequality to an equality by introducing a slack variable:
+\begin{align}
+\begin{aligned}
+	\sum a_i x_i &\leq b_i
+\end{aligned}
+&\sim
+\left(\begin{aligned}
+	\sum a_i x_i + s &= b_i \\
+	s &\geq 0
+\end{aligned}\right)
+\end{align}
