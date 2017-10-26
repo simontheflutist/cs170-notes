@@ -1,0 +1,46 @@
+\chapter{Duality}
+\begin{theorem}
+	In a flow graph from \(s\) to \(t\), the maximum flow is equal to the minimum capacity of an \(s\)-\(t\) cut.
+\end{theorem}
+\begin{proof}
+	Beginning with \(G = (V, E)\), the algorithm completes with a residual graph \(G' = (V, E')\). Call \(L\) be the vertices reachable from \(s\) and \(R\) the vertices co-reachable from \(t\). Let \(e\subseteq E\) be the edges that cross \(L\to R\) and \(e' \subseteq E\) the ones that cross from \(R\to L\). The maximum flow is \(\sum_{L\xrightarrow{e}R} f_e - \sum_{R\xrightarrow{e'}L} f_{e'}\) for some \(f\), and the minimum cut is \(\sum_{L\xrightarrow{e}R} c_e\).
+	
+	We know that \(f_e = c_e\) and \(f_{e'} = 0\). (Both contradict the assumption that \(L\) and \(R\) are disjoint.)
+\end{proof}
+
+\subsection{Runtime of max flow}
+The time required for one iteration is \(O\left(\left|E\right|\right)\), and the number of iterations is \(O(F)\). In all, we need \(O\left(F\left|E\right|\right)\).
+
+\section{Bipartite matching}
+We have a bipartite graph of boys and girls, where there is an edge between \(b_i\) and \(g_i\) if boy \(b_i\) likes girl \(g_i\).
+Is such a pairing possible?
+
+Connect a  source to all the boys and a sink to all the girls. Point all edges towards the sink. Set each edge's capacity to 1.
+The maximum flow of this graph is how many source-boy edges and girl-sink edges are saturated, which is the number of feasible couples.
+This is true because the max flow algorithm chooses integral flows on all edges.
+
+\begin{theorem}
+	If all the edges have integral capacities, then the flow on each edge is integral.
+\end{theorem}
+
+%\section{Duality}
+For LP, instead of maximizing with \(x_i\), solve for a least upper bound by multipliers on the constraints. (\emph{duality})
+
+\section{Reductions}
+Problem \(P\) reduces to \(Q\) if \(P\) can be solved using \(Q\) as a subroutine. An input undergoes preprocessing, \(Q\)-solving, and then postprocessing.
+
+Circuit evaluation reduces to LP:
+let \(x_g\) be the output value of gate \(g\). \(0\leq x_g \leq 1\) for all gates.
+\begin{alignat}{2}
+	h &= \lnot g &&\implies x_h = 1 - x_g \\
+	h &= g \land g' &&\implies \left\{\begin{aligned}
+		x_h &\leq x_g \\
+		x_h &\leq  x_{g'} \\
+		x_h &\geq x_g + x_{g'} - 1
+	\end{aligned}\right\}\\
+	h &= g \lor g' &&\implies \left\{\begin{aligned}
+	x_h &\geq x_g \\
+	x_h &\geq  x_{g'} \\
+	x_h &\leq x_g + x_{g'}
+	\end{aligned}\right\}
+\end{alignat}
