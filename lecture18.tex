@@ -1,15 +1,12 @@
-\chapter{Duality}
-\begin{theorem}
-	In a flow graph from \(s\) to \(t\), the maximum flow is equal to the minimum capacity of an \(s\)-\(t\) cut.
-\end{theorem}
-\begin{proof}
-	Beginning with \(G = (V, E)\), the algorithm completes with a residual graph \(G' = (V, E')\). Call \(L\) be the vertices reachable from \(s\) and \(R\) the vertices co-reachable from \(t\). Let \(e\subseteq E\) be the edges that cross \(L\to R\) and \(e' \subseteq E\) the ones that cross from \(R\to L\). The maximum flow is \(\sum_{L\xrightarrow{e}R} f_e - \sum_{R\xrightarrow{e'}L} f_{e'}\) for some \(f\), and the minimum cut is \(\sum_{L\xrightarrow{e}R} c_e\).
-	
-	We know that \(f_e = c_e\) and \(f_{e'} = 0\). (Both contradict the assumption that \(L\) and \(R\) are disjoint.)
-\end{proof}
-
-\subsection{Runtime of max flow}
-The time required for one iteration is \(O\left(\left|E\right|\right)\), and the number of iterations is \(O(F)\). In all, we need \(O\left(F\left|E\right|\right)\).
+\chapter{More LP}
+%\begin{theorem}
+%	In a flow graph from \(s\) to \(t\), the maximum flow is equal to the minimum capacity of an \(s\)-\(t\) cut.
+%\end{theorem}
+%\begin{proof}
+%	Beginning with \(G = (V, E)\), the algorithm completes with a residual graph \(G' = (V, E')\). Call \(L\) be the vertices reachable from \(s\) and \(R\) the vertices co-reachable from \(t\). Let \(e\subseteq E\) be the edges that cross \(L\to R\) and \(e' \subseteq E\) the ones that cross from \(R\to L\). The maximum flow is \(\sum_{L\xrightarrow{e}R} f_e - \sum_{R\xrightarrow{e'}L} f_{e'}\) for some \(f\), and the minimum cut is \(\sum_{L\xrightarrow{e}R} c_e\).
+%	
+%	We know that \(f_e = c_e\) and \(f_{e'} = 0\). (Both contradict the assumption that \(L\) and \(R\) are disjoint.)
+%\end{proof}
 
 \section{Bipartite matching}
 We have a bipartite graph of boys and girls, where there is an edge between \(b_i\) and \(g_i\) if boy \(b_i\) likes girl \(g_i\).

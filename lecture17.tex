@@ -1,0 +1,87 @@
+\chapter{Linear programming II}
+Convert to a minimization problem with equalities in non-negative variables:
+\begin{align}
+\begin{matrix}
+	\max & 4x_1 + 2x_2 \\
+	\text{subj.~to} &\begin{aligned}
+		3x_1 &\leq 60 \\
+		3x_2 &\leq 75 \\
+		3x_1 + 2x_2 &\leq 100 \\
+		x_1, x_2 &\geq 0
+	\end{aligned}
+\end{matrix}
+\end{align}
+Solution:
+\begin{align}
+\begin{matrix}
+\min & -\left(4x_1 + 2x_2\right)\\
+& \begin{aligned}
+3x_1 + s_1 &= 60 \\
+3x_2 + s_2 &= 75 \\
+3x_1 + 2x_2 + s_3 &= 100\\
+x_1, x_2, s_1, s_2, s_3 &\geq 0
+\end{aligned}
+\end{matrix}
+\end{align}
+
+\section{Flows in graphs}
+You have a directed graph \(G = \left(V, E\right)\) with weights \(c\) that state the maximum flow along an edge.
+We want to get the maximum flow that can be passed through an edge, subject to edge capacity:
+\begin{align}
+\forall (u, v) \in E: f_{u,v} \leq c_{u, v}
+\end{align}
+and conservation:
+\begin{align}
+\forall v\in \left(V-\left\{s, t\right\}\right): \sum_{v^\flat\to v} f_{v^\flat,v} &= \sum_{v\to v^\sharp} f_{v, v^\sharp}
+\end{align}
+The objective flow from \(s\) to \(t\) is
+\begin{align}
+\max \sum_{s\to s^\sharp} f_{s, s^\sharp} \quad \text{or} \quad \max \sum _{t^\flat \to t} f_{t^\flat, t}
+\end{align}
+If we were to use \textsc{Simplex}, we'd begin with any flow that respects the given constraints (for example, a zero flow) and then improve it until a better solution is known. We will apply the same idea in a different algorithm specialized for \textsc{max flow}.
+
+\subsection{Algorithm for max flow}
+Let \(G\) have \(c_{u,v}\) for all \((u,v)\in E\).
+\begin{algorithmic}[1]
+	\While {\(\exists \,\text{path}\, s\rightsquigarrow t\)}
+		\State \(P\gets\) \(s\rightsquigarrow t\) path in \(G\).
+		\State \(f = \min_{e\in P} c_e\)
+		\For{\(\left(u, v\right) \in P\)}
+			\State \(c_{u, v}\gets c_{u, v} - f\)
+			\State \(c_{v,u}\gets c_{v, u} + f\)
+		\EndFor
+	\EndWhile
+\end{algorithmic}
+\begin{itemize}
+	\item Idea of \(c_{u, v}\gets c_{u, v} - f\):
+	
+	Allow all edges of \(P\) to be saturated by flow through the weakest link (this step is greedy---give \(P\) as much flow as possible).
+	\item Idea of \(c_{v,u}\gets c_{v, u} + f\):
+	
+	This edge in the reverse direction gives you a chance to undo the flow you just committed to. In case you pushed too much flow through a path that should not accept it, a later greedy step will not be hindered by the new saturation. (Think about a maximum flows on individual edges: \(+1\) and \(-1\) cancel---you're not calculating exactly how much goes where.)
+\end{itemize}
+\begin{proof}
+	Let \(\left(L, R\right)\) be an \(s\)-\(t\) cut. We will show that \(\max \sum_{s\to s^\sharp} f_{s, s^\sharp} \leq c(L, R)\) for any cut \((L, R)\).
+	
+	The \(s\)-\(t\) flow is given by
+	\begin{align}
+		\sum_{\begin{matrix}
+			u\in L \\
+			v \in R\\
+			\end{matrix}} \left(f_{u, v} - f_{v, u}\right) & \phantom{{}={}}
+		\intertext{Letting \(f_{u, v} \leq c_{u, v}\) and \(f_{v, u} = 0\),}
+		&\leq \sum_{\begin{matrix}
+			u\in L \\
+			v \in R\\
+			\end{matrix}} c_{u, v} = c(L, R)
+	\end{align}
+	So cuts are dual to flows: each cut is a bound on the possible max flow. We will show that there is no gap: the max flow is equal to the smallest cut.
+
+	In the algorithm, we stopped as soon as there was no \(s\)-\(t\) path. Let \(L\) be the vertices reachable from \(s\) in the final graph and \(R\) the vertices co-reachable from \(t\). It appears that \(c(L, R)\) is the max flow. \(L\) and \(R\) are disjoint because all edges are already saturated by candidate flow.
+	
+	Perhaps there is an edge from \(R\) to \(L\). But there is no flow along the back edge, because there is no way for the flow to return to \(R\).
+	
+\end{proof}
+
+\subsection{Runtime of max flow}
+The time required for one iteration is \(O\left(\left|E\right|\right)\), and the number of iterations is \(O(F)\). In all, we need \(O\left(F\left|E\right|\right)\).
