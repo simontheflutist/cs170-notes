@@ -3,4 +3,4 @@ They said taking notes is good for learning.
 
 ## Build instructions
 
-    pdflatex cs170-notes.pdf
+    pdflatex cs170-notes.tex
