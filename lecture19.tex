@@ -1,0 +1,72 @@
+\chapter{Zero-sum Games, Incompleteness}
+``My loss is your gain.''
+\section{Rock-paper-scissors}
+One zero-sum game is rock-paper-scissors:
+	\begin{align}
+	\begin{matrix}
+	\text{(payoff to \textsc{row player})}& \text{\textsc{Column player}} \\
+	\text{\textsc{Row player}} & 
+	\begin{tabular}{l|rrrr}
+	 & r & p & s \\\hline
+	 r & 0 & -1 & 1 \\
+	 p & 1 & 0 & -1 \\
+	 s & -1 & 1 & 0
+	\end{tabular}
+	\end{matrix}
+	\end{align}
+If \textsc{row player} plays with probabilities \(x_1, x_2, x_3\) and \textsc{column player} with probabilities \(y_1, y_2, y_3\), then the objective is 
+%\begin{align}
+%\sum_{i,j} G_{ij}x_iy_j,
+%\end{align}
+\(\sum_{i,j} G_{ij}x_iy_j\), which \textsc{row player} wants to maximize and \textsc{column player} wants to minimize.
+The objective is equivalently \(\sum_i x_i \sum_j G_{ij}y_j\) 
+or \(\sum_j y_j \sum_x G_{ij}x_i\).
+If \textsc{row player} plays uniformly, then expected payoff is a multiple of \(\frac{1}{3}\sum_i G_{ij} = 0\).
+
+What if \textsc{row player} announces his strategy? Even then, \textsc{column player} can do no better.
+Consider choosing between strategies:
+\begin{align}
+\begin{matrix}
+& c_1 & c_2 \\
+r_1 & 3 & -1 \\
+r_2 & -2 & 1 
+\end{matrix}
+\end{align}
+Suppose \textsc{row player} plays \(x_1, x_2\).
+\textsc{Column payer}'s payoffs can be selected from \(3x_1 - 2x_2\) and \(-x_1 + x_2\), so his best payoff is
+\begin{align}
+\max_{x_1, x_2} \min \left\{3x_1 - 2x_2, -x_1, + x_2\right\} &\\
+\intertext{Likewise, the column player's optimum payoff is}
+\min_{y_1, y_2} \max \left\{3y_1 - y_2, -2y_1 + y_2\right\} &
+\end{align}
+We will frame the two strategy specifications as dual linear programs. A linear program for the first strategy (\(z =  \min \{\ldots\}\)):
+\begin{align}
+\begin{matrix}
+\max & z \\
+\text{subj.~to} & \begin{aligned}
+-3x_1 + 2x_2 + z &\leq 0 \\
+x_1 - x_2 + z &\leq 0 \\
+x_1 + x_2 &= 1 \\
+x_1, x_2 &\geq 0
+\end{aligned}
+\end{matrix} &
+\intertext{and for the second:}
+\begin{matrix}
+\min & w \\
+\text{subj.~to} & \begin{aligned}
+-3y_1 + y_2 + w &\geq 0 \\
+2y_1 - y_2 + w &\geq 0 \\
+y_1 + y_2 &= 1 \\
+y_1, y_2 &\geq 0
+\end{aligned}
+\end{matrix}
+\end{align}
+Applying multipliers \(y_1, y_2, w\) (resp.~\(x_1, x_2, z\)) one gets the duality. The expected payoff is \(\frac{1}{7}\).
+\section{Hard Problems (e.g.~SAT)}
+There exist problems for which we do not have efficient algorithms. It is not, however, a pure tragedy, for hardness helps with cryptography. One such problem is SAT: you are given a boolean formula such as
+\(\left(x\lor y\lor z\right)\left(x\lor\overline{y}\right)\left(y\lor \overline{z}\right) \left(z\lor\overline{x}\right)\left(\overline{x}\lor \overline{y} \lor \overline{z}\right)\), and are asked whether any \(\left(x, y, z\right)\) make this true. (This is in conjunctive normal form: an \textsc{and} of \textsc{or}s.) Sadly, we know no better algorithm than brute-force (but there is no lower bound yet).
+
+SAT is called a \emph{search problem}. Generally, a search problem is of the form: given an instance \(I\) find a solution \(S\), or say no. A search problem is specified by an algorithm \(C\) that takes an instance and a solution and decides in time \(\operatorname{polynomial}\left(\left|I\right|\right)\) whether the solution is correct. \(C_\text{SAT}\) would be simple evaluation.
+\subsection{TSP as a search problem}
+How do you validate a TSP solution? In the ``best solution'' form \(\left(n, d[i,j]\right)\) it is not easy to validate.
+But you can formulate a search problem in the same spirit as follows: ``find a permutation \(\tau\) such that the induced path has cost less than \(b\).'' Then computing the cost of a candidate solution can be done in polynomial time. (To get a solution to standard TSP, binary search \(b\) bounds.)
