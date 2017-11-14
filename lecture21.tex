@@ -1,0 +1,62 @@
+\chapter{NP-completeness II}
+\section{SAT \(\to\) 3SAT}
+3SAT is a specific instance of SAT: consider our CNF expressions to include
+at most 3 literals per clause.
+To achieve this reduction, the strategy is to add more variables and more 
+clauses:
+\begin{align*}
+	f: \left(a_1 \lor a_2 \lor \ldots \lor a_k\right)
+	\mapsto \left(a_1 \lor a_2 \lor x_1 \right)
+		\left(\overline{x}_1 \lor a_3 \lor x_2 \right)
+		\ldots
+		\left(\overline{x}_{k - 3} \lor a_{k - 3} a_{k - 1} a_{k}\right)
+\end{align*}
+(We will add fresh \(x\) variables for each necessary clause conversion.) To get the solution back,
+\begin{align*}
+	h: \left(a_1,\ldots, a_n, x_1, \ldots, x_t\right)\mapsto
+	\left(a_1,\ldots, a_n\right)
+\end{align*}
+
+We need to show (\(I' = f(I)\)):
+\begin{enumerate}
+	\item If \(I'\) is solved by \(\left(a_1,\ldots, a_n, x_1, \ldots, x_t\right)\), then \(I\) is solved by \(\left(a_1,\ldots, a_n\right)\).
+	
+	\item If \(I'\) has no solution, then \(I\) has no solution.
+\end{enumerate}
+Both follow from induction on the number of clauses.
+
+\section{3SAT \(\to\) 3-appearance 3SAT}
+Suppose in a conjunction of clauses \(x\) appears 20 times.
+Then you could make variables \(x_1,\ldots,x_{20}\) to replace each individual x,
+then add the clauses \(\left(x_1 \lor \overline{x}_2\right)\left(x_2 \lor \overline{x}_3\right)\ldots \left(x_{20} \lor \overline{x}_1\right)\). So \(f\) replaces repeated variables and adds implication constraints, and \(h\) needs to convert a 3-appearance 3SAT answer to a 3SAT answer. But for \(h\), just let \(x^I = x^{I'}_1\), etc.
+
+\section{3SAT \(\to\) Independent Set}
+\textsc{Independent Set}: given \(G = (V, E)\) and \(b\), find \(S\subseteq V\) such that \(\left|S\right| = b\) and \(\forall u,v \in S: \left(u,v\right) \not\in E\).
+
+The graph contains all terms \(x, \overline{x}\) as vertices.
+For each clause, form a \(\left\{1,2,3\right\}\)-gon in which ORed literals
+are connected. 
+Now add edges between all negations \(x, \overline{x}\).
+They cannot be in the same independent set if we're trying to use an independent set to represent a solution.
+We want \(b\) to be the number of disjunctive clauses, with the intuition that each
+clause wants to be satisfied.
+
+\section{Independent Set \(\to\) Vertex Cover}
+\textsc{Vertex Cover}: given \(G = (V, E)\) and \(b\), find \(S\subseteq V\) with \(\left|S\right| = b\) and \(\forall \left(u, v\right)\in E: u\in S\ \text{or}\ v\in S\).
+This is a simple reduction! \(f = 1\), \(h: S'\mapsto \left(V - S'\right)\).
+The complement of an independent set is a vertex cover.
+
+\section{Independent Set \(\to\) Clique}
+\textsc{Clique}:
+Given \(G' = \left(V', E'\right)\) and \(b'\), find \(S'\subseteq V'\) with \(\left|S\right| = b\) and \(\forall u, v \in S: (u,v) \in E'\).
+So let \(f: \left(V, E\right) \mapsto \left(V, V\times V - E\right)\) and \(h=1\).
+
+\section{3-appearance 3SAT to 3D matching}
+We already did bipartite matching. A \textsc{3D matching} considers boys, girls, and pets. You're given a list of boy-girl-pet permissible tuples and asked whether there's any boy-girl-pet triple assignment that satisfies all boys, girls, and pets.
+
+So we want to make a graph structure (a \emph{gadget}) that models the 3D matching constraints.
+Let boys, girls, and pets form a graph, and add a little ``triangular'' vertex
+at the apex of each boy-girl-pet-bingo pyramid.
+
+Each gadget is a rectangle that forces you two choose between two possible ways to assign two triplets, so represent each binary variable by a gadget.
+Then each boolean clause maps to a new gadget with a new boy and a new girl and a pet required to finish the clause's stipulations\ldots continued next lecture\ldots
