@@ -1,0 +1,43 @@
+\chapter{NP-completeness}
+We define two classes of search problems:
+\begin{description}
+	\item[P] search problems such that there exists a \(\operatorname{poly}\left(\left|I\right|\right)\) algorithm.
+	\item[NP] all search problems
+\end{description}
+By definition \(\text{P} \subseteq \text{NP}\).
+If \(\text{P} = \text{NP}\), all problems are polynomially solvable.
+But \(\text{P} \neq \text{NP}\) doesn't necessarily tell that any particular
+problem is in \(\left(\text{NP}-\text{P}\right)\).
+
+We write \(A\to B\) for ``\(A\) reduces to \(B\),'' specifically,
+``\(A\) can be solved using an algorithm for \(B\).'' (Reductions are polynomial.)
+What is possible, given \(A\to B\)?
+\begin{center}
+\begin{tabular}{rrc}
+	               \(A\) &                \(B\) & possible? \\ \hline
+	    \(\in \text{P}\) &     \(\in \text{P}\) &     1     \\
+	 \(\notin \text{P}\) &     \(\in \text{P}\) &     0     \\
+	    \(\in \text{P}\) & \(\not\in \text{P}\) &  \\
+	\(\not\in \text{P}\) & \(\not\in \text{P}\) &
+\end{tabular}
+\end{center}
+
+In order to show that \(3\text{SAT}\) is ``hard'', we need to show
+that every search problem reduces to 3SAT.
+A search problem is \emph{NP-complete} if all search problems reduce to that problem.
+
+\section{Rudrata \((s, t)\) path \(\longrightarrow\) Rudrata cycle}
+Given \(G = \left(V, E\right)\), a Rudrata \(s,t\) path is a path \(s\rightsquigarrow t\) that visits each node exactly once.
+Given \(G' = (V', E')\), a Rudrata cycle is a cycle that visits each node in \(G'\) exactly once. We need a function \(f\) that sends \(G\) to \(G'\).
+
+One idea is to add an edge from \(s\) to \(t\). But this does not work, as the cycle detected is not necessarily one that uses the newly added edge. To force the cycle to pass through \(s\) adjacent to \(t\), instead add a vertex \(x\) and edges \(\left\{(s, x), (x, t)\right\}\). Now a cycle going through \(G'\) must equivalently pass through \(s\) and \(t\).
+
+We need to show the following algorithms have runtimes polynomial in their inputs:
+\begin{enumerate}
+	\item Converting an instance of \textsc{rpath} to \textsc{rcycle}.
+	\item Converting an \textsc{rcycle} ``yes'' decision to an \textsc{rpath} solution.
+	\item Converting an \textsc{rcycle} ``no'' decision to an \textsc{rpath} ``no'' answer.
+\end{enumerate}
+
+\section{Composition property}
+If \(A\to B\) and \(B\to C\), we have \(f_{AB}\), \(h_{AB}\), \(f_{BC}\), and \(h_{BC}\). We wish to construct \(f_{AC}\) and \(h_{AC}\). But \(f_{AC} = f_{BC}f_{AB}\) and \(h_{AC} = f_{AB}f_{BC}\).
