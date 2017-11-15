@@ -1,0 +1,32 @@
+\chapter{More NP-completeness}
+\section{3-appearance 3SAT \(\to\) 3D matching cont.}
+Consider how \(x\) appears three times: if all CNF clauses use \(x\), or \(\overline{x}\), then set \(x=1\) or \(x=0\), respectively.
+
+In 3D matching, we have \(\left\{b_1,\ldots, b_n\right\}\), \(\left\{g_1,\ldots, g_n\right\}\), and \(\left\{p_1,\ldots, p_n\right\}\), and a list of permitted triples \((b, g, p)\). The gadget that represents a 3-3SAT variable is a graph of 2 boys, 2 girls, and 4 pets, with the following 4 possibilities:
+\begin{align*}
+	\begin{Bmatrix}
+	b_0 & g_0 & p_2\\
+	b_0 & g_1 & p_0 \\
+	b_1 & g_0 & p_1\\
+	b_1 & g_1 & p_3
+	\end{Bmatrix}
+\end{align*}
+Let \(\left\{p_2, p_3\right\} \simeq \textsc{false}\) and \(\left\{p_0, p_1\right\} \simeq \textsf{\textsc{true}}\).
+
+To represent the expression \(\left(x \lor \overline{y} \lor z\right)\), we will use three gadgets, with 6 boys, 6 girls, and 12 pets in total.
+We will add a boy, \(b_{c_1}\), and a girl \(g_{c_1}\), that represent this constraint. By connecting \(\left(b_{c_1}, g_{c_1}, p_{\text{\(x\) is true}}\right)\) (similarly for a negation) we can represent by b-g-p satisfiable pairs that represent this constraint. This works for as many variables and constraints as necessary, as it's not necessary to represent any literal 3 times. As we have leftover pets, introduce ``nice'' boys and girls that'll take whatever pet necessary.
+
+\section{\(\left\{\text{NP}\right\} \to \text{Circuit-SAT} \left(\to \text{SAT}\right)\)}
+Return to the definition of a search problem: find \(S\) such that \(C(I, S) = 1\).
+Circuit-SAT uses a circuit of NAND gates, 1/0 constants, and ``?''. The goal is to make the circuit output 1.
+
+Proof that ``compiling'' to a circuit is polynomial: every step of the algorithm corresponds to \(O(1)\) layers of a NAND circuit.
+
+To reduce Circuit-SAT to SAT, set a binary variable for every input to the circuit (in CNF).
+Every input has its own CNF unary clause.
+Each NAND gate can be translated into \(O(1)\) CNF clauses.
+
+\section{3D matching \(\to\) ZOE (0-1 equality)}
+\textsc{Zero-one equality}: given a matrix \(A\in 2^{m\times m}\), solve \(Ax = \vec{1}\).
+One idea is to pick ZOE variables \(x_1, \ldots, x_m\) representing each feasible triplet.
+The matrix \(A\) constrains that each boy, girl, and pet is used exactly once.
