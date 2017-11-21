@@ -1,0 +1,40 @@
+\chapter{Even more NP-completeness}
+\section{ZOE \(\to\) ILP}
+The reduction is immediate by expressing equality constraints by inequalities.
+\section{ZOE \(\to\) Subset Sum}
+ZOE is \(Ax = 1\). Subset sum is given \(\left\{a_1,\ldots,a_m\right\}\) to find \(S\subseteq m\) such that \(\sum_{i\in S} a_i = B\).
+
+One idea is to represent the numbers as binary numerals in columns of \(A\). But combining them using \(x\) doesn't work because there will be no carry in the addition.
+But the solution is to represent in a higher radix? So carry is not necessary.
+
+\section{ZOE \(\to\) Rudrata Cycle}
+We will first reduce ZOE to \textsc{Rudrata Cycle with Paired Edges}.
+For RCPE, you have a set of edge pairs \(C \subseteq E\times E\) and are
+allowed to use only one edge from each pair. (You are allowed to have more than one edge per vertex pair.)
+
+We will try to convert ZOE into a graph. The idea is that for each
+component of \(x\) we will make a gadget of two vertices joined by two edges,
+corresponding to 0 or 1.
+Each row of \(A\) (dotted with \(x\)) will correspond to a two-vertex graph joined by edges labeled according to the positions of \(1\) in the row.
+Connect all the 2-vertex gadgets end to end.
+The paired-edge constraints need to ensure that if several edges are labeled by the same binary variable, they need to be chosen altogether or not at all in the \textsc{rcpe} output. This is accomplished by including in \(C\) all pairs \((\lnot x, x)\), with labels taken  from the \(x\) gadget and the \(A\)-row gadgets, respectively.
+
+Now we will reduce \textsc{rcpe} to \textsc{rc}, beginning with the case
+\(\left|C\right| = 1\) (you can repeat this as many times as necessary for larger \(C\)).
+Given \(e = \left(a, b\right)\) and \(e' = \left(c, d\right)\), delete these two connections and connect \(a\), \(b\), \(c\), and \(d\) using a \(3\times 4\)
+grid of extra vertices and edges (too hard to draw)---as it happens, the only way to go from \(a\) to \(b\) is to take up vertices that would otherwise be required for connecting \(c\) to \(d\).
+
+\section{Approximation algorithm}
+Suppose we are trying to minimize something.
+The approximation ratio \(\alpha_A\) for an algorithm \(A\) is defined as
+\(\max_{\text{instance}\ I} \frac{A(I)}{\operatorname{optimal}(I)}\).
+
+There is an approximation for \textsc{Vertex Cover} with \(\alpha = 2\).
+A \emph{maximum matching} is a matching for which no more edges can be added.
+\begin{theorem}
+	For any maximal matching \(M\) (which is a vertex cover), \(2\left|M\right| \geq \left|\text{minimal vertex cover}\right| \geq \left|M\right|\).
+\end{theorem}
+\begin{proof}
+	The lower bound is obvious: each vertex must be touched at least once.
+	For the upper bound, assume \(S\) is not a vertex cover. Then just add the rest of the edges as needed.
+\end{proof}
