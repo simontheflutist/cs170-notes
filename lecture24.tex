@@ -1,0 +1,87 @@
+\chapter{Approximation}
+\section{Clustering}
+Given a set \(X = \left\{x_1,\ldots, x_m\right\}\), a positive integer \(k\), and a metric \(d: X^2\to \mathbb{R}\):
+\begin{align}
+d(x,y) &= 0 \iff  x = y \\
+d(x, y) &\geq 0 \\
+d(x, y) &= d(y, x)\\
+d(x, z) + d(z, y) &\geq d(x, y)
+\end{align}
+we want to output a partition \(C_1\ldots C_k\) of \(X\) that minimizes the \emph{diameter}:
+\begin{align}
+\text{diam} &= \max_{j \in \left\{1\ldots k\right\}} \max_{x_a, x_b \in C_j} d\left(x_a, x_b\right)
+\end{align}
+
+We have an approximation algorithm with ratio at most 2.
+\begin{algorithm}
+\begin{algorithmic}
+	\State Pick any point \(\mu_1 \in X\).
+	\For {\(i = 1\ \text{to}\ k\)}
+		\State Pick \(\mu_i\) to be the point farthest from \(\mu_1\ldots\mu_{i - 1}\).
+	\EndFor
+	\State \Return \(\left\{C_i = \left\lbrace\text{all \(x\in X\) closest to \(\mu_i\)}\right\rbrace\right\}\)
+\end{algorithmic}
+\end{algorithm}
+\begin{proof}
+	Suppose that \(x\) is the point that is farthest from \(\mu_1, \ldots, \mu_k\) (returned by the algorithm).
+	Let \(r\) be the distance between \(x\) and the closest center \(\mu_j\). We will try to show that \(2r \geq \text{OPT} \geq r\).
+	\(r\) is the diameter of the \(j\)th cluster, and the optimal solution cannot do better.
+	
+	For the upper bound on the optimal solution: perhaps \(x\) is not the only point that is \(r\) from the nearest center. Then perhaps two radii add to a diameter, and we bound the optimal diameter by \(2r\) using the triangle inequality.
+	
+	(Proof that \(\mu_j\) and \(x\) go together follows from pigeonhole principle.)
+\end{proof}
+
+\section{Traveling Salesman Problem}
+If we include the Triangle Inequality, we can have a 2-approximation algorithm.
+Given our graph \(G = (V, E)\) with weights \(w_e\), we will begin by making a minimum spanning tree.
+We will prove that
+\begin{align}
+2 w(\text{MST}) \geq w(\text{OPT-TSP}) \geq w(\text{MST}).
+\end{align}
+\begin{proof}
+	The right inequality is obtained by deleting the most expensive edge of a TSP solution.
+	If a salesman toured the MST, he'd spend exactly \(2w\left(\text{MST}\right)\).
+	For an even better approximation, the salesman can skip visited nodes on the MST tour
+	(which by the triangle inequality cannot possibly be worse than taking the MST twice).
+\end{proof}
+
+\section{Rudrata Cycle \(\to\) \(c\)-TSP}
+\subsection{Rudrata Cycle \(\to\) TSP}
+Given \(G = (V, E)\), assign \(w_e = 1\) if \(e\in E\), otherwise make \(G'\) a complete version of \(G\) by letting \(w_e = 1+\alpha\)
+on new edges. The TSP budget will be \(\left|V\right|\).
+\subsection{\ldots \(\to\) \(c\)-TSP}
+If there is a Rudrata cycle, \(c\)-TSP finds it. If there is no Rudrata cycle, \(c\)-TSP returns weight at least \(\left|V\right| + \alpha\).
+Then by choosing \(\alpha\) suitably, you can solve \textsc{Rudrata cycle} using the approximate TSP solver.
+TSP is \emph{hard to approximate}.
+
+\section{Knapsack: an easy approximation}
+\textsc{Knapsack}: given \(m\) items with weights \(w_i\) and values \(v_i\) and budget \(W\), find a subset of indices \(S\)  that maximizes
+\(\sum_{i \in S} v_i\) subject to \(\sum_{i\in S} w_i \leq W\). We already have a DP algorithm that solves this in \(O(nW)\) or \(O(nV)\).
+We will use something like the \(O(nV)\) technique but discarding bits of \(v_i\) to get a polynomial approximation for \(V\).
+Given \(0<\varepsilon<1\), we can reach \(\left(1 - \varepsilon\right)\text{OPT}\) in runtime \(O\left(\operatorname{poly}\left(\left|I\right|, \varepsilon^{-1}\right)\right)\).
+
+Convert values \(v_i\) to \(\hat{v}_i\) by the following map:
+\begin{align}
+\hat{v}_i &= \left\lfloor \frac{v_i n}{\varepsilon v_\text{max}} \right\rfloor
+\end{align}
+then run the \(O(nV)\) solver with these  new parameters \(\hat{v}_i\).
+Proof of runtime:
+\begin{align}
+n\hat{V} = n\sum_i \hat{v}_i \leq \frac{n^3}{\varepsilon}.
+\end{align}
+Proof of correctness: suppose the approximate returns \(\hat{S}\). Its value is
+\begin{align}
+\sum_{i \in 
+	\hat{S}}
+	v_i &\leq \sum_{i \in 
+		\hat{S}} \hat{v}_i\frac{num}{den} \\
+%	
+\sum_{i \in 
+	S} \hat{v}_i \geq \sum_{i\in S}
+&\geq \sum_{i \in 
+	S} \left\lfloor \frac{v_i n}{\varepsilon v_\text{max}}\right\rfloor \\
+&\geq \sum_{i \in 
+	S} \left(\frac{v_in}{\varepsilon v_\text{max}} - 1\right) \\
+&\geq \frac{\left(\sum_{i\in S} v_i\right)n}{\varepsilon v_\text{max}} -n
+\end{align}
