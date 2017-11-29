@@ -1,0 +1,53 @@
+\chapter{Special topics}
+\section{Primality testing}
+\begin{description}
+	\item[input] \(n\in \mathbb{N}\)
+	\item[output] whether \(n\) is prime
+\end{description}
+The na\"ive algorithm is to test all integers between \(2\) and \(\sqrt{n}\).
+Including multiplication time, this takes \(O\left(\sqrt{n} \operatorname{poly}\left(\log n\right)\right)\).
+
+\begin{theorem}[Fermat's Little Theorem]
+	If \(p\) is a prime number and \(a\) is a number s.t.~\((a, p) = 1\), then \(a^{p - 1} = 1 \mod p\).
+\end{theorem}
+\begin{proof}
+	First of all, note that \(a\)-multiplication permutes \(\mathbb{Z}/p\mathbb{Z}\).
+	Then
+	\begin{align}
+		\prod_{\text{distinct}\ x\in \mathbb{Z}/p\mathbb{Z}}\left(a\cdot x\right) &= \prod x \\
+		a^{p - 1} &= 1
+	\end{align}
+\end{proof}
+A primality test on \(n\) could be to choose random \(x \in \left\{1,\ldots, n\right\}\)\footnote{should be relatively prime with \(n\), else, \(n\) is definitely not prime.} and return whether all \(x_i^{m - 1} = 1 \mod m\).
+
+\subsection{Correctness}
+This test never misses a prime, but sometimes thinks a composite is prime. Cases for when \(x\) is a composite:
+\begin{enumerate}
+	\item \(x^{n - 1} \neq 1 \mod n\). Then for sure \(n\) is not prime.
+	\item \(x^{n - 1} = 1 \mod n\)
+	\begin{enumerate}
+		\item \(\exists x_0\) (not necessarily in the algorithm) such that \(x_0^{n - 1} \neq 1\mod n\):
+		
+		If there is a single valid witness of compositeness somewhere, then at least \(\frac{1}{2}\) of all potential witnesses are valid.
+		\begin{proof}
+			Consider some \(a \neq x_0\). Then at least one of \(\left\{a, x_0a\right\}\) is a valid witness of compositeness: if \(a^{n - 1} = 1\mod n\), then \(\left(x_0a\right)^{n - 1} = x_0^{n - 1} \neq 1 \mod n\).
+		\end{proof}
+		\item \(\nexists x_0 < n\) such that \(x_0^{n - 1} \neq 1\mod n\):
+		
+		The test fails (outputs ``prime'') w.p.~1. These odd numbers are called Carmichael numbers.
+		The \emph{Miller-Rabin algorithm} is a fix for Carmichael numbers in this algorithm: factor \(n - 1\) as \(2^st\),
+		where \(t\) is an odd number. For random \(x\), compute \(x^t, x^{2t}, \ldots, x^{2^st}\).
+		If \(x^{n - 1} \neq 1\mod n\), then return ``composite.''
+		If any \(x^{2^it} = 1 \mod n\) and \(x^{2^{i - 1}t}\neq \pm 1\mod n\), then return ``composite.''
+		Otherwise, return ``probably prime.''
+	\end{enumerate}
+\end{enumerate}
+
+\section{Randomness}
+Intuition: use the hardness of hard problems to generate psuedorandom bits from some small amount of true random bits---they might not be random, but it would be computationally infeasible to discover the pattern.
+\subsection{Hardness assumption}
+One-way permutations are a family of permutations \(\left\{f_n : 2^n \to 2^n\right\}_{n\in N}\) such that:
+\begin{enumerate}
+	\item \(\forall x\in 2^n\ f_n(x)\)is computable in \(\operatorname{poly}(n)\) time.
+	\item \(\forall \left(\text{probabilistic polynomial-time alg.}\ A\right): \forall c: \exists n_0:\ \forall n>n_0 \Pr\left[A(F(n)) = x\right] \leq \frac{1}{n^c}\)
+\end{enumerate}
