@@ -1,0 +1,52 @@
+\chapter{Crypto cont.}
+More notes on one-way permutations: a function that grows slower than all inverse polynomials is called \emph{negligible}---as a probability, it means something is basically impossible.
+
+\section{Rabin's function}
+We will not give a one-way function that is not one-to-one but four-to-one: the Rabins function.
+For a size \(n\), choose \(N\) with \(n\) bits. Then the mapping is \(x^2 \mod N\).
+
+We assume that factoring (input \(N\), output \((p, q)\)) is hard. Can this show that Rabin's problem (input \(x^2 \mod N\) with \(N = pq\), output \(x\)) is hard?
+
+\subsection{{Factoring} \(\to\) {Rabin's}}
+Use the same \(N\) for both instances. Sample \(z\) at random and give \(y =  z^2\mod N\) to the \textsc{Rabin's} solver.
+The solver will output \(\pm z\) or \(\pm z'\) (the other square root) w.p.~\(\frac{1}{2}\epsilon\).
+Then \(N\) is factored as \(\left(z + z'\right)\left(z - z'\right)\) (you can get primes using GCD).\footnote{There is no way for an adversary to provide a bad \textsc{Rabin's} solver (that systematically misses a square root pair), because the reduction algorithm randomly chooses either square root of \(z^2\).} The same algorithm can be made one-to-one by restricting the choices of domain and \(N\).
+
+\section{Hardness-backed psuedorandomness}
+Suppose we have a one-way permutation \(f: 2^n \to 2^n\).
+If we pick a random \(x\) and apply \(f\) to it, the result will be uniformly distributed (because \(f\) is bijective).
+We will imagine an algorithm that takes \(2n\) bits of randomness and outputs \(2n+1\) bit of randomness:
+\begin{align}
+x, r &\mapsto f(x), r, B(x,r) \\
+B(x, r) &= \left\langle x_i, r_i\right\rangle \mod 2
+\end{align}
+\(B\) is the hardcore bit function.
+\begin{theorem}
+	For any PPTA \(A\), \(\Pr\left[ A\left(f(x), r\right) = B(x, r)\right] - \frac{1}{2}\) is negligible.
+\end{theorem}
+\begin{proof}
+	We will show that computing this one bit is as hard as inverting the entire function.
+	We will find a reduction from one-way-inversion to hardcore-bit-prediction. (Sadly, it is only a Turing reduction.)
+	
+	In the case that \(A\) is \emph{certainly} right, it suffices to vary \(r\) over a basis of \(\left(\mathbb{Z}/2\mathbb{Z}\right)^n\).
+	For unreliable or tricky \(A\) functions you will have to try more vectors more times to hit a basis that reconstructs \(x\) from \(f(x)\).
+\end{proof}
+
+Given a OWP \(f: 2^n \to 2^n\), is \(g: 2^{m \gg n} \to 2^{m \gg n}\) that does \(f\) on the first \(n\) bits and then passes all the rest through an OWP?
+\begin{theorem}
+	(See above question.) No.
+\end{theorem}
+\begin{proof}
+	Reduction again. Given \(y = f(x)\), we will pass \(y\oplus r\) (\(r\) a random string) to \(g\), and we will from the former bits recover \(x\).
+\end{proof}
+
+\section{Coin flipping over the phone}
+Alice and Bob are flipping a coin to decide who will pay for dinner: one person will flip a coin and the other will reports the assignment.
+But this can be solved with hardcore bits.
+
+\begin{enumerate}
+	\item \textsc{Alice} samples \(x\) and \(r\) from \(2^n\).
+	\item \textsc{Alice} sends \(f(x), r\) to \textsc{Bob}. (\textsc{Alice} knows \(B(x,r)\) but \textsc{Bob} does not.)
+	\item \textsc{Bob} reports an assignment \(c\in 2\).
+	\item \textsc{Alice} and \textsc{Bob} agree on \(c\oplus B(x, r)\). (\textsc{Bob} is able to verify \(B(x,r)\) because he knows \(f\) as well.)
+\end{enumerate}
