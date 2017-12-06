@@ -34,7 +34,7 @@ B(x, r) &= \left\langle x_i, r_i\right\rangle \mod 2
 
 Given a OWP \(f: 2^n \to 2^n\), is \(g: 2^{m \gg n} \to 2^{m \gg n}\) that does \(f\) on the first \(n\) bits and then passes all the rest through an OWP?
 \begin{theorem}
-	(See above question.) No.
+	(See above question.) Yes.
 \end{theorem}
 \begin{proof}
 	Reduction again. Given \(y = f(x)\), we will pass \(y\oplus r\) (\(r\) a random string) to \(g\), and we will from the former bits recover \(x\).
